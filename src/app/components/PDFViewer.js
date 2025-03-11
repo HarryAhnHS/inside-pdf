@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-import pdfToText from 'react-pdftotext';
-
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import { pdfjs } from 'react-pdf';
@@ -17,11 +15,9 @@ const PDFViewer = ({ file }) => {
 
     const [pageNumber, setPageNumber] = useState(1);
     const [numPages, setNumPages] = useState(null);
-    
     // for dynamic width
     const [width, setWidth] = useState(null);
     const pdfWrapperRef = useRef(null);
-
     const [pageText, setPageText] = useState("");
 
     useEffect(() => {
@@ -47,24 +43,24 @@ const PDFViewer = ({ file }) => {
 		setNumPages(numPages);
 	};
 
-//     useEffect(() => {
-//         const extractTextFromPage = async () => {
-//             setLoading(true);
-//             try {
-//                 text = await pdfToText(file);
-//                 setPageText(text);
-//             }
-//             catch(error) {
-//                 console.error("Failed to extract text from pdf")
-//             }
-//             finally {
-//                 setLoading(false);
-//             }
-//         }
-//     if (file) {
-//         extractTextFromPage();
-//     }
-//   }, [file, pageNumber]);
+    // On each re-render of page, extract text content for the current page
+    const onRenderSuccess = async ({ pageNumber }) => {
+        setLoading(true);
+        try {
+            const arrayBuffer = await file.arrayBuffer(); // extract data from blob using array buffer
+            const pdf = await pdfjs.getDocument({data: arrayBuffer}).promise;
+            const page = await pdf.getPage(pageNumber);
+            const tokenizedText = await page.getTextContent();
+            const extractedText = tokenizedText.items.map((token) => token.str).join(""); // Combine all elements into a string
+            setPageText(extractedText);
+        }
+        catch(error) {
+            console.error("Failed to render pdf text");
+        }
+        finally {
+            setLoading(false);
+        }
+    };
 
     const goToPage = (page) => {
         setPageNumber(page);
@@ -108,13 +104,13 @@ const PDFViewer = ({ file }) => {
             </button>
         </div>
 
-        {/* PDF Viewport */}
+        {/* PDF container */}
         <div className="w-full" ref={pdfWrapperRef}>
             <Document
                 file={file}
                 onLoadSuccess={onDocumentLoadSuccess}
             >
-                <Page pageNumber={pageNumber} width={width}/>
+                <Page pageNumber={pageNumber} width={width} onRenderSuccess={onRenderSuccess} renderTextLayer={false}/>
             </Document>
         </div>
     </div>

@@ -35,7 +35,7 @@ export default function Home() {
 
       {/* PDF Viewer with smooth transition */}
       {showPDFViewer && (
-        <div ref={pdfViewerRef} className="transition-all">
+        <div ref={pdfViewerRef} className="transition-all flex justify-center items-center">
           <PDFViewer file={file} />
         </div>
       )}
