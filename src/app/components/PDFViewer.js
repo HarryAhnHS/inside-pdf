@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import pdfToText from 'react-pdftotext';
 
@@ -9,9 +9,7 @@ import 'react-pdf/dist/Page/TextLayer.css';
 import { pdfjs } from 'react-pdf';
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-
 import { Document, Page } from 'react-pdf';
-
 
 
 const PDFViewer = ({ file }) => {
@@ -19,8 +17,31 @@ const PDFViewer = ({ file }) => {
 
     const [pageNumber, setPageNumber] = useState(1);
     const [numPages, setNumPages] = useState(null);
+    
+    // for dynamic width
+    const [width, setWidth] = useState(null);
+    const pdfWrapperRef = useRef(null);
 
     const [pageText, setPageText] = useState("");
+
+    useEffect(() => {
+        // Calculate the current width of the container
+        const setDivSize = () => {
+            if (pdfWrapperRef.current) {
+                setWidth(pdfWrapperRef.current.getBoundingClientRect().width);
+            }
+        };
+        setDivSize();
+        const handleResize = () => {
+            setDivSize();
+        };
+        window.addEventListener("resize", handleResize);
+
+        // Cleanup the listener
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
 
     const onDocumentLoadSuccess = ({ numPages }) => {
 		setNumPages(numPages);
@@ -62,7 +83,7 @@ const PDFViewer = ({ file }) => {
         <div className="flex justify-between mb-4">
             <button
             onClick={goToPrevPage}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer disabled:opacity-50"
             disabled={pageNumber === 1}
             >
                 Prev
@@ -80,18 +101,22 @@ const PDFViewer = ({ file }) => {
             </div>
             <button
             onClick={() => goToPage(goToNextPage)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer disabled:opacity-50"
             disabled={pageNumber === numPages}
             >
                 Next
             </button>
         </div>
-        <Document
-            file={file}
-            onLoadSuccess={onDocumentLoadSuccess}
-        >
-            <Page pageNumber={pageNumber} />
-        </Document>
+
+        {/* PDF Viewport */}
+        <div className="w-full" ref={pdfWrapperRef}>
+            <Document
+                file={file}
+                onLoadSuccess={onDocumentLoadSuccess}
+            >
+                <Page pageNumber={pageNumber} width={width}/>
+            </Document>
+        </div>
     </div>
   );
 };
