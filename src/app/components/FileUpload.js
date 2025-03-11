@@ -7,7 +7,7 @@ const FileUpload = ({ onFileChange }) => {
         type="file"
         accept="application/pdf"
         onChange={onFileChange}
-        className="mb-4 p-3 bg-blue-500 text-white rounded-lg cursor-pointer"
+        className="mb-4 p-3 bg-neutral-800 text-white rounded-lg cursor-pointer"
       />
     </div>
   );

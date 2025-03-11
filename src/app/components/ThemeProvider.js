@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import Favicon from './favicon.ico';
 
 const ThemeContext = createContext({
   theme: 'light',
@@ -14,12 +13,6 @@ export function useTheme() {
 
 export default function ThemeProvider({ children }) {
   const [theme, setTheme] = useState('light');
-
-  // Update favicon based on theme
-  useEffect(() => {
-    const favicon = document.querySelector('link[rel="icon"]');
-    favicon.href = Favicon.src;
-  }, []);
 
   useEffect(() => {
     // Check if user has a theme preference in localStorage
