@@ -16,7 +16,8 @@ const getTTS = async (req, res) => {
         const ttsResponse = await axios.post(
         PLAYAI_API_URL,
         {
-            // Default voice for now
+            text: text,
+            // Default voice for now + TODO implement dropdown selection
             voice: 'Angelo',
             accent: 'american',
             language: 'English (US)',
@@ -25,7 +26,6 @@ const getTTS = async (req, res) => {
             sample: 'https://peregrine-samples.s3.us-east-1.amazonaws.com/parrot-samples/Angelo_Sample.wav',
             gender: 'male',
             style: 'Conversational',
-            text: text,
         },
         {
             headers: {
