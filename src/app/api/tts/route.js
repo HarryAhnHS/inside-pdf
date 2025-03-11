@@ -1,51 +1,84 @@
+import voices from '../../models/voices';
 import axios from 'axios';
 
 const PLAYAI_API_KEY = process.env.PLAYAI_API_KEY;
+const PLAYAI_USER_ID = process.env.PLAYAI_USER_ID;
 const PLAYAI_API_URL = 'https://api.play.ai/api/v1/tts/stream';
 
-const getTTS = async (req, res) => {
-    const { text } = req.body;
+// POST request handler
+export async function POST(request) {
+  console.log('TTS API route accessed');
+
+  try {
+    // Parse the body of the request
+    const { text, voice, speed, temperature } = await request.json();
 
     // Validation
-    if (!text) {
-        return res.status(400).json({ error: 'Text is required' });
+    if (!text || !voice) {
+      return new Response(
+        JSON.stringify({ error: 'Text and voice are required' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
     }
 
-    try {
-        // Make request to PlayAI TTS API
-        const ttsResponse = await axios.post(
-        PLAYAI_API_URL,
-        {
-            text: text,
-            // Default voice for now + TODO implement dropdown selection
-            voice: 'Angelo',
-            accent: 'american',
-            language: 'English (US)',
-            languageCode: 'EN-US',
-            value: 's3://voice-cloning-zero-shot/baf1ef41-36b6-428c-9bdf-50ba54682bd8/original/manifest.json',
-            sample: 'https://peregrine-samples.s3.us-east-1.amazonaws.com/parrot-samples/Angelo_Sample.wav',
-            gender: 'male',
-            style: 'Conversational',
+    // Select voice based on the voice name
+    const selectedVoice = voices.find((v) => v.name === voice)?.value;
+    if (!selectedVoice) {
+      return new Response(
+        JSON.stringify({ error: 'Selected voice not found' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('TTS API: Selected voice:', selectedVoice);
+
+    // Make the request to the PlayAI TTS API
+    const response = await axios.post(
+      PLAYAI_API_URL,
+      {
+        model: 'PlayDialog',
+        text: text,
+        voice: selectedVoice,
+        outputFormat: 'mp3',
+        speed: speed || 1,
+        temperature: temperature || 0.7,
+        sampleRate: 24000,
+      },
+      {
+        headers: {
+          'Accept': 'audio/mpeg',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${PLAYAI_API_KEY}`,
+          'X-USER-ID': PLAYAI_USER_ID,
         },
-        {
-            headers: {
-            'Authorization': `Bearer ${PLAYAI_API_KEY}`, // Auth 
-            'Content-Type': 'application/json',
-            },
-            responseType: 'stream',
-        }
-        );
+        responseType: 'arraybuffer', // Receiving audio as an arraybuffer
+      }
+    );
 
-        // Set headers for audio response
-        res.setHeader('Content-Type', 'audio/mpeg');
-        res.setHeader('Content-Disposition', 'inline; filename="audio.mp3"');
-
-        // Pipe the PlayAI audio stream to the client
-        ttsResponse.data.pipe(res);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error generating audio' });
+    if (response.status !== 200) {
+      throw new Error('Failed to generate audio');
     }
-};
 
-export default getTTS;
+    const audioData = response.data;
+    console.log('Received audio data, size:', audioData.byteLength);
+
+    // Return the audio file as response
+    return new Response(audioData, {
+      status: 200,
+      headers: {
+        'Content-Type': 'audio/mpeg',
+        'Content-Length': audioData.byteLength.toString(),
+      },
+    });
+  } catch (err) {
+    console.error('TTS API Error:', { message: err.message, stack: err.stack });
+
+    return new Response(
+      JSON.stringify({
+        error: 'Error generating audio',
+        details: err.message,
+      }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+};
