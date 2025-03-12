@@ -1,37 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# PlayAI PDF Reader
 
-## Getting Started
+A modern web application that combines PDF viewing with AI-powered text-to-speech capabilities. Upload your PDFs and listen to them with customizable voice settings.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- 📱 Responsive PDF viewer with page navigation
+- 🔊 AI-powered text-to-speech with multiple voices
+- ⚡ Real-time audio generation and playback
+- 🎛️ Customizable voice settings (speed, temperature)
+- 🌓 Dark/Light mode support
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Technology Stack
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- **Frontend Framework**: Next.js 14 with App Router
+- **UI Components**: Shadcn/UI + Tailwind CSS
+- **Animations**: GSAP
+- **PDF Handling**: React-PDF + PDF.js
+  - Uses PDF.js Web Worker to run in separate thread to prevent UI blocking
+  - Configured via CDN for optimal loading
+- **Audio**: Web Audio API + PlayAI API
+  - Text-to-speech powered by PlayAI's advanced neural models
+  - Real-time audio streaming with low latency
+  - Multiple AI voices with customizable parameters
+- **Icons**: Lucide React
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Run Locally
 
-## Learn More
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/playai-pdf-reader.git
+   cd playai-pdf-reader
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Configure environment variables:
+   ```bash
+   # Create a .env.local file in the root directory
+   touch .env
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   # Add the following variables (replace with your actual values)
+   PLAYAI_API_KEY=your_api_key_here
+   PLAYAI_USER_ID=your_user_id_here
+   ```
 
-## Deploy on Vercel
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# playai-pdf-reader
+## Design Decisions
+
+- **Component Architecture**: Modular components (PDFViewer, AudioControls, FileUpload) for better maintainability and reusability
+- **State Management**: React hooks for local state, keeping the implementation simple and efficient
+- **UI/UX**: 
+  - Clean, minimal interface with smooth animations
+  - Consistent design language using Shadcn open-source components + global tailwind css components
+  - Responsive layout
+  - Singla page layout, with component animation using GSAP
+  - Dark mode / light mode
+
+- **Performance**: 
+  - Dynamic imports for PDF viewer
+  - Blob audio streaming
