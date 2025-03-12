@@ -4,6 +4,8 @@ import { useRef, useEffect } from "react"
 import { open as openEmbed } from '@play-ai/agent-web-sdk';
 import { gsap } from "gsap"
 
+const webEmbedId = process.env.PLAYAI_WEB_EMBED_ID;
+
 const VoiceAgent = ({ isExpanded, text }) => {
   const containerRef = useRef(null)
   const contentRef = useRef(null)

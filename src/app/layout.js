@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ThemeProvider from "./components/ThemeProvider";
+import Head from "next/head";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,6 +23,17 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <Head>
+        <script type="text/javascript" async src="https://unpkg.com/@play-ai/agent-web-sdk" />
+        <script type="text/javascript" dangerouslySetInnerHTML={{
+          __html: `
+            addEventListener("load", () => {
+              PlayAI.open('${process.env.PLAYAI_WEB_EMBED_ID}');
+            });
+          `
+        }}
+        />
+      </Head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background font-sans antialiased`}
       >
