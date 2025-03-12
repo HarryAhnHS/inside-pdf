@@ -61,6 +61,7 @@ const PDFViewer = ({ file, handleChangeFile }) => {
 
   return (
     <div className="w-full max-w-2xl" ref={containerRef}>
+      {/* Change File Button */}
       <div className="flex justify-start pb-4">
         <Button 
           variant="outline" 
@@ -72,8 +73,9 @@ const PDFViewer = ({ file, handleChangeFile }) => {
           Change File
         </Button>
       </div>
+      
       <Card 
-      className="w-full max-w-2xl mx-auto shadow overflow-hidden pt-0 bg-muted/20"
+      className="w-full max-w-2xl mx-auto shadow overflow-hidden pt-0 pb-12 bg-muted/20"
       >
         <CardContent className="p-0">
           {/* Navbar */}
