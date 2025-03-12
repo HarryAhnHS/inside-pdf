@@ -42,9 +42,10 @@ export async function POST(request) {
         text: text,
         voice: selectedVoice,
         outputFormat: 'mp3',
-        speed: speed || 1,
-        temperature: temperature || 0.7,
+        speed: speed,
+        temperature: temperature,
         sampleRate: 24000,
+        seed: 0
       },
       {
         headers: {

@@ -1,11 +1,27 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Play, Pause, Loader2, FileAudio } from "lucide-react"
+import { Play, Pause, Loader2, FileAudio, Gauge } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Card, CardContent } from "@/components/ui/card"
 import PDFAudioSettings from "./PDFAudioSettings"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+const PLAYBACK_SPEEDS = [
+  { value: 0.25, label: "0.25x" },
+  { value: 0.5, label: "0.5x" },
+  { value: 0.75, label: "0.75x" },
+  { value: 1, label: "1x" },
+  { value: 1.25, label: "1.25x" },
+  { value: 1.5, label: "1.5x" },
+  { value: 2, label: "2x" },
+]
 
 const PDFAudioControls = ({ pageText }) => {
   const [isPlaying, setIsPlaying] = useState(false)
@@ -14,12 +30,14 @@ const PDFAudioControls = ({ pageText }) => {
   const [audio, setAudio] = useState(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [playbackSpeed, setPlaybackSpeed] = useState(1)
   const progressInterval = useRef(null)
   const abortControllerRef = useRef(null)
 
+  // Default settings
   const [settings, setSettings] = useState({
     voice: "Angelo",
-    speed: 1,
+    speed: 2,
     temperature: 0.7,
   })
 
@@ -57,16 +75,19 @@ const PDFAudioControls = ({ pageText }) => {
   useEffect(() => {
     if (audio) {
       const updateProgress = () => {
+        // Update times based on playback rate
         setCurrentTime(audio.currentTime)
         setDuration(audio.duration || 0)
       }
 
       audio.addEventListener("timeupdate", updateProgress)
       audio.addEventListener("loadedmetadata", updateProgress)
+      audio.addEventListener("ratechange", updateProgress)
 
       return () => {
         audio.removeEventListener("timeupdate", updateProgress)
         audio.removeEventListener("loadedmetadata", updateProgress)
+        audio.removeEventListener("ratechange", updateProgress)
       }
     }
   }, [audio])
@@ -172,15 +193,23 @@ const PDFAudioControls = ({ pageText }) => {
     fetchAudio(formData)
   }
 
+  const handleSpeedChange = (speed) => {
+    if (audio) {
+      audio.playbackRate = speed
+      setPlaybackSpeed(speed)
+    }
+  }
+
   return (
     <Card className="rounded-none border-none p-0 !bg-transparent shadow-none">
       <CardContent className="px-8 py-4">
         {isLoading ? (
-          <div className="w-full flex items-center justify-center">
-            <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="w-full flex-col items-center justify-center text-muted-foreground">
+            <div className="flex justify-center items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
               <span className="text-sm">Processing audio...</span>
             </div>
+            <p className="text-center text-xs italic">It may take a while for the audio to load.</p>
           </div>
         )
         :
@@ -224,11 +253,36 @@ const PDFAudioControls = ({ pageText }) => {
                 </span>
               </div>
 
-              <PDFAudioSettings 
-                settings={settings} 
-                onSettingsChange={handleSettingsChange}
-                onSubmit={handleSettingsSubmit}
-              />
+              <div className="flex items-center">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      disabled={!audioUrl}
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 px-1 text-xs font-medium flex items-center gap-1 text-muted-foreground hover:text-foreground"
+                    >
+                        {playbackSpeed}x
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    {PLAYBACK_SPEEDS.map((speed) => (
+                      <DropdownMenuItem
+                        key={speed.value}
+                        onClick={() => handleSpeedChange(speed.value)}
+                        className="text-xs"
+                      >
+                        {speed.label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <PDFAudioSettings 
+                  settings={settings} 
+                  onSettingsChange={handleSettingsChange}
+                  onSubmit={handleSettingsSubmit}
+                />
+              </div>
             </div>
           </div>
           )

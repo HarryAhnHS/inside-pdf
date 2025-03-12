@@ -118,7 +118,7 @@ const PDFAudioSettings = ({
                     <FormControl>
                       <Slider
                         min={0}
-                        max={1}
+                        max={2}
                         step={0.1}
                         value={[field.value]}
                         onValueChange={(value) => field.onChange(value[0])}
