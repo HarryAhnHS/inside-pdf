@@ -83,7 +83,7 @@ const PDFViewer = ({ file }) => {
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto shadow overflow-hidden pt-0">
+    <Card className="w-full max-w-2xl mx-auto shadow overflow-hidden pt-0">
       <CardContent className="p-0">
         {/* PDF navigation bar */}
         <div className="py-6 px-4 flex items-center justify-between">
@@ -125,8 +125,8 @@ const PDFViewer = ({ file }) => {
         <AudioControls pageText={pageText} />
 
         {/* PDF View container */}
-        <div className="w-full bg-muted/20" ref={pdfWrapperRef}>
-          <div className="flex justify-center">
+        <div className="w-full" ref={pdfWrapperRef}>
+          <div className="flex justify-center items-center">
             <Document
               file={file}
               onLoadSuccess={onDocumentLoadSuccess}

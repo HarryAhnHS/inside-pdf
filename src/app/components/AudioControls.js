@@ -150,7 +150,7 @@ const AudioControls = ({ pageText }) => {
 
   if (isLoading) {
     return (
-      <div className="w-full flex items-center justify-center pb-6">
+      <div className="w-full flex items-center justify-center py-6">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span className="text-sm">Generating audio...</span>
@@ -161,7 +161,7 @@ const AudioControls = ({ pageText }) => {
 
   return (
     <Card className="rounded-none border-none pt-0 px-0">
-      <CardContent className="px-4">
+      <CardContent className="px-12">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <Button

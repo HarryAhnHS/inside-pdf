@@ -39,15 +39,9 @@ const FileUpload = ({ onFileChange }) => {
     }
   }
 
-  const handleRemove = () => {
-    setSelectedFile(null)
-    // Reset the file input by triggering onFileChange with null
-    onFileChange({ target: { files: [] } })
-  }
-
   return (
     <Card className="w-full max-w-2xl">
-      <CardContent className="px-6">
+      <CardContent>
         <div
           className={`relative flex flex-col items-center justify-center w-full min-h-[200px] rounded-lg border-2 border-dashed transition-colors ${
             dragActive
@@ -75,21 +69,7 @@ const FileUpload = ({ onFileChange }) => {
                 {selectedFile ? selectedFile.name : "Drop your PDF here"}
               </p>
               <p className="text-sm text-muted-foreground">
-                {selectedFile ? (
-                  <span className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-auto p-0 text-destructive hover:text-destructive/90"
-                      onClick={handleRemove}
-                    >
-                      <X className="w-4 h-4 mr-1" />
-                      Remove file
-                    </Button>
-                  </span>
-                ) : (
-                  "or click to browse"
-                )}
+                  or click to browse
               </p>
             </div>
           </div>

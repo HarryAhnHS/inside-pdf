@@ -29,18 +29,18 @@ export default function Home() {
   };
 
   return (
-    <div>
+    <>
       {/* Landing */}
-      <div className="w-full transition-all flex justify-center items-center">
+      <div className="w-full transition-all flex justify-center items-center py-6">
         <FileUpload onFileChange={handleFileChange} />
       </div>
 
       {/* PDF Viewer with smooth transition */}
       {showPDFViewer && (
-        <div ref={pdfViewerRef} className="transition-all flex justify-center items-center">
+        <div ref={pdfViewerRef} className="transition-all flex justify-center items-center py-6">
           <PDFViewer file={file} />
         </div>
       )}
-    </div>
+    </>
   );
 }
