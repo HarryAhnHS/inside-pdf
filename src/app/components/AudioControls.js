@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Play, Pause, RefreshCw } from "lucide-react"
+import { Play, Pause, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Card, CardContent } from "@/components/ui/card"
@@ -91,6 +91,7 @@ const AudioControls = ({ pageText }) => {
       const url = URL.createObjectURL(audioBlob)
       setAudioUrl(url)
       const newAudio = new Audio(url)
+      newAudio.preload = "metadata"
       setAudio(newAudio)
 
       newAudio.addEventListener("ended", () => setIsPlaying(false))
@@ -100,6 +101,7 @@ const AudioControls = ({ pageText }) => {
       })
 
       setIsLoading(false)
+
     } catch (error) {
       console.error("Error generating audio:", error)
       setIsPlaying(false)
@@ -136,6 +138,17 @@ const AudioControls = ({ pageText }) => {
     setSettings(newSettings)
   }
 
+  if (isLoading) {
+    return (
+      <div className="w-full flex items-center justify-center pb-6">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span className="text-sm">Generating audio...</span>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <Card className="rounded-none border-none pt-0 px-0">
       <CardContent className="px-4">
@@ -143,14 +156,12 @@ const AudioControls = ({ pageText }) => {
           <div className="flex items-center gap-3">
             <Button
               onClick={handlePlayPause}
-              disabled={!audioUrl || isLoading}
+              disabled={!audioUrl}
               size="icon"
               variant={isPlaying ? "default" : "outline"}
               className="h-10 w-10 rounded-full flex-shrink-0"
             >
-              {isLoading ? (
-                <RefreshCw className="h-5 w-5 animate-spin" />
-              ) : isPlaying ? (
+              {isPlaying ? (
                 <Pause className="h-5 w-5" />
               ) : (
                 <Play className="h-5 w-5" />
@@ -163,9 +174,9 @@ const AudioControls = ({ pageText }) => {
               </span>
               <div className="w-full px-1">
                 <Slider
-                  disabled={!audio || isLoading}
+                  disabled={!audio}
                   min={0}
-                  max={duration || 100}
+                  max={duration}
                   step={0.1}
                   value={[currentTime]}
                   onValueChange={handleSeek}

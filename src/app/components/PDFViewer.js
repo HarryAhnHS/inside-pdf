@@ -107,7 +107,7 @@ const PDFViewer = ({ file }) => {
                 max={numPages || 1}
                 className="px-1 h-9 text-center w-16"
               />
-              <span className="text-muted-foreground text-nowrap">of {numPages || "-"}</span>
+              <span className="text-xs text-muted-foreground text-nowrap">of {numPages || "-"}</span>
             </div>
 
             <Button

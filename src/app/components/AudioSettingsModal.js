@@ -63,12 +63,10 @@ export function AudioSettingsModal({
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="Angelo">Angelo</SelectItem>
-                      <SelectItem value="Alloy">Alloy</SelectItem>
-                      <SelectItem value="Echo">Echo</SelectItem>
-                      <SelectItem value="Fable">Fable</SelectItem>
-                      <SelectItem value="Onyx">Onyx</SelectItem>
-                      <SelectItem value="Nova">Nova</SelectItem>
-                      <SelectItem value="Shimmer">Shimmer</SelectItem>
+                      <SelectItem value="Deedee">Deedee</SelectItem>
+                      <SelectItem value="Jennifer">Jennifer</SelectItem>
+                      <SelectItem value="Briggs">Briggs</SelectItem>
+                      <SelectItem value="Samara">Samara</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription>
