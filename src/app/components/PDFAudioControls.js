@@ -22,7 +22,7 @@ const PDFAudioControls = ({ pageText }) => {
   // Default settings
   const [settings, setSettings] = useState({
     voice: "Angelo",
-    speed: 2,
+    speed: 1.3,
     temperature: 0.7,
   })
 
@@ -189,12 +189,12 @@ const PDFAudioControls = ({ pageText }) => {
     <Card className="rounded-none border-none p-0 !bg-transparent shadow-none">
       <CardContent className="px-8 py-4">
         {isLoading ? (
-          <div className="w-full flex items-center justify-center">
-            <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="w-full flex-col items-center justify-center text-muted-foreground">
+            <div className="flex justify-center items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
               <span className="text-sm">Processing audio...</span>
-              <div className="text-xs italic">It may take a while for the audio to load.</div>
             </div>
+            <p className="text-center text-xs italic">It may take a while for the audio to load.</p>
           </div>
         )
         :
