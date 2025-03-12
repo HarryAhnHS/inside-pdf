@@ -148,17 +148,6 @@ const AudioControls = ({ pageText }) => {
     fetchAudio(formData)
   }
 
-  // if (isLoading) {
-  //   return (
-  //     <div className="w-full flex items-center justify-center py-6 bg-muted/20">
-  //       <div className="flex items-center gap-2 text-muted-foreground">
-  //         <Loader2 className="h-4 w-4 animate-spin" />
-  //         <span className="text-sm">Generating audio...</span>
-  //       </div>
-  //     </div>
-  //   )
-  // }
-
   return (
     <Card className="rounded-none border-none p-0 !bg-transparent shadow-none">
       <CardContent className="px-12 py-4">
