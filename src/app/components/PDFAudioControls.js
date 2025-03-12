@@ -15,6 +15,7 @@ const PDFAudioControls = ({ pageText }) => {
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const progressInterval = useRef(null)
+  const abortControllerRef = useRef(null)
 
   const [settings, setSettings] = useState({
     voice: "Angelo",
@@ -28,10 +29,15 @@ const PDFAudioControls = ({ pageText }) => {
     }
     return () => {
       clearInterval(progressInterval.current)
+      // Abort any pending fetch request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
     }
   }, [pageText])
 
   useEffect(() => {
+    // Audio player Unmount cleanup
     return () => {
       if (audio) {
         audio.pause()
@@ -41,6 +47,10 @@ const PDFAudioControls = ({ pageText }) => {
         URL.revokeObjectURL(audioUrl)
       }
       clearInterval(progressInterval.current)
+      // Abort any pending fetch request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
     }
   }, [])
 
@@ -74,9 +84,17 @@ const PDFAudioControls = ({ pageText }) => {
         URL.revokeObjectURL(audioUrl)
       }
 
+      // Abort previous fetch if exists
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+
+      // Create new AbortController for this fetch
+      abortControllerRef.current = new AbortController()
+
       // Use formData if provided, otherwise use current settings
       const requestData = formData || settings
-      console.log('Sending TTS request with settings:', requestData)  // Debug log
+      console.log('Sending TTS request with settings:', requestData)
       
       const response = await fetch(`/api/tts`, {
         method: "POST",
@@ -87,6 +105,7 @@ const PDFAudioControls = ({ pageText }) => {
           speed: requestData.speed,
           temperature: requestData.temperature,
         }),
+        signal: abortControllerRef.current.signal
       })
 
       if (!response.ok) {
@@ -109,6 +128,11 @@ const PDFAudioControls = ({ pageText }) => {
       setIsLoading(false)
 
     } catch (error) {
+      // Don't show error if it was due to abort
+      if (error.name === 'AbortError') {
+        console.log('Fetch aborted')
+        return
+      }
       console.error("Error generating audio:", error)
       setIsPlaying(false)
       setIsLoading(false)
