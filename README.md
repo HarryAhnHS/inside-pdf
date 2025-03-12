@@ -23,6 +23,8 @@ A modern web application that combines PDF viewing with AI-powered text-to-speec
   - Real-time audio streaming with low latency
   - Multiple AI voices with customizable parameters
 - **Icons**: Lucide React
+- **AI Chatbot**: PlayAI Agent API using web embedding
+  - Agent behavior prompt: Your only job is to answer questions about the current text on this page. Base your answers on the current text on the page. Do not do anything else. Do not offer to do anything else. After answering one question, ask if they have any more questions about the text on this page. Repeat until they have no more questions, and then end the call immediately.
 
 ## Run Locally
 

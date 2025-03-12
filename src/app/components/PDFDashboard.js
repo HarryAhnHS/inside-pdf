@@ -7,11 +7,14 @@ import "react-pdf/dist/Page/AnnotationLayer.css"
 import "react-pdf/dist/Page/TextLayer.css"
 
 import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft, Wand2, X } from "lucide-react"
+
 import PDFAudioControls from "./PDFAudioControls"
 import PDFNavBar from "./PDFNavBar"
 import PDFViewContainer from "./PDFViewContainer"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
+import VoiceAgent from "./VoiceAgent"
+
 
 // Configure PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
@@ -21,6 +24,7 @@ const PDFDashboard = ({ file, handleChangeFile }) => {
   const [pageNumber, setPageNumber] = useState(1)
   const [numPages, setNumPages] = useState(null)
   const [pageText, setPageText] = useState("")
+  const [isVoiceAgentExpanded, setIsVoiceAgentExpanded] = useState(false)
   const containerRef = useRef(null)
 
   useEffect(() => {
@@ -61,18 +65,43 @@ const PDFDashboard = ({ file, handleChangeFile }) => {
 
   return (
     <div className="w-full max-w-2xl" ref={containerRef}>
-      {/* Change File Button */}
-      <div className="flex justify-start pb-4">
+      {/* Meta toolbar */}
+      <div className="flex justify-between items-center pb-4">
+        {/* Change File Button */}
         <Button 
-          variant="outline" 
+          variant="ghost" 
           onClick={handleChangeFile}
           size="sm"
-          className="h-9 px-4 text-xs"
+          className="h-8 px-4 text-xs text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="h-4 w-4" />
           Change File
         </Button>
+        {/* Voice Agent Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsVoiceAgentExpanded(!isVoiceAgentExpanded)}
+          className="h-8 px-4 text-xs text-muted-foreground hover:text-foreground"
+        >
+          {isVoiceAgentExpanded ? (
+            <X className="h-4 w-4" />
+          ) : (
+            <Wand2 className="h-4 w-4" />
+          )}
+          {isVoiceAgentExpanded ? (
+            'Hide AI'
+          ) : (
+            'Ask AI'
+          )}
+        </Button>
       </div>
+      
+      {/* Voice Agent Expandable Section */}
+      <VoiceAgent 
+        isExpanded={isVoiceAgentExpanded}
+        text={pageText}
+      />
       
       <Card 
       className="w-full max-w-2xl mx-auto shadow overflow-hidden pt-0 pb-12 bg-muted/20"
