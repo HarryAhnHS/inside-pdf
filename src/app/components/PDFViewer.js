@@ -98,14 +98,14 @@ const PDFViewer = ({ file }) => {
               Previous
             </Button>
 
-            <div className="flex items-center justify-center space-x-2 text-sm">
+            <div className="flex items-center justify-center space-x-2">
               <Input
                 type="number"
                 value={pageNumber}
                 onChange={handleInputChange}
                 min="1"
                 max={numPages || 1}
-                className="px-1 h-9 text-center w-16"
+                className="text-center"
               />
               <span className="text-xs text-muted-foreground text-nowrap">of {numPages || "-"}</span>
             </div>

@@ -29,9 +29,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div>
       {/* Landing */}
-      <FileUpload onFileChange={handleFileChange} />
+      <div className="w-full transition-all flex justify-center items-center">
+        <FileUpload onFileChange={handleFileChange} />
+      </div>
 
       {/* PDF Viewer with smooth transition */}
       {showPDFViewer && (

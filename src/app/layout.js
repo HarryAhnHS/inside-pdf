@@ -21,18 +21,20 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable}`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background font-sans antialiased`}
       >
         <ThemeProvider>
-          <main className="flex justify-center bg-stone-100 dark:bg-stone-900 min-h-screen selection:bg-yellow-200 dark:selection:bg-yellow-800">
-            <div className="flex flex-col gap-4 w-full my-6 md:m-12 text-neutral-500 dark:text-neutral-400 font-[380] md:mt-[60px]">
-              <Header />
+          <div className="relative flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1 flex justify-center">
+              <div className="container flex-1 py-6 md:py-12">
                 {children}
-              <Footer />
-            </div>
-          </main>
+              </div>
+            </main>
+            <Footer />
+          </div>
         </ThemeProvider>
       </body>
     </html>
