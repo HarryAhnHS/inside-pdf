@@ -148,62 +148,74 @@ const AudioControls = ({ pageText }) => {
     fetchAudio(formData)
   }
 
-  if (isLoading) {
-    return (
-      <div className="w-full flex items-center justify-center py-6">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          <span className="text-sm">Generating audio...</span>
-        </div>
-      </div>
-    )
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="w-full flex items-center justify-center py-6 bg-muted/20">
+  //       <div className="flex items-center gap-2 text-muted-foreground">
+  //         <Loader2 className="h-4 w-4 animate-spin" />
+  //         <span className="text-sm">Generating audio...</span>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   return (
-    <Card className="rounded-none border-none pt-0 px-0">
-      <CardContent className="px-12">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <Button
-              onClick={handlePlayPause}
-              disabled={!audioUrl}
-              size="icon"
-              variant={isPlaying ? "default" : "outline"}
-              className="h-10 w-10 rounded-full flex-shrink-0"
-            >
-              {isPlaying ? (
-                <Pause className="h-5 w-5" />
-              ) : (
-                <Play className="h-5 w-5" />
-              )}
-            </Button>
-
-            <div className="flex-1 flex items-center gap-2">
-              <span className="text-xs text-muted-foreground w-8 text-right flex-shrink-0">
-                {formatTime(currentTime)}
-              </span>
-              <div className="w-full px-1">
-                <Slider
-                  disabled={!audio}
-                  min={0}
-                  max={duration}
-                  step={0.1}
-                  value={[currentTime]}
-                  onValueChange={handleSeek}
-                />
-              </div>
-              <span className="text-xs text-muted-foreground w-8 flex-shrink-0">
-                {formatTime(duration)}
-              </span>
+    <Card className="rounded-none border-none p-0 !bg-transparent shadow-none">
+      <CardContent className="px-12 py-4">
+        {isLoading ? (
+          <div className="w-full flex items-center justify-center">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">Generating audio...</span>
             </div>
-
-            <AudioSettingsModal 
-              settings={settings} 
-              onSettingsChange={handleSettingsChange}
-              onSubmit={handleSettingsSubmit}
-            />
           </div>
-        </div>
+        )
+        :
+          (
+          <div>
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={handlePlayPause}
+                disabled={!audioUrl}
+                size="icon"
+                variant={isPlaying ? "default" : "outline"}
+                className="h-10 w-10 rounded-full flex-shrink-0"
+              >
+                {isPlaying ? (
+                  <Pause className="h-5 w-5" />
+                ) : (
+                  <Play className="h-5 w-5" />
+                )}
+              </Button>
+
+              <div className="flex-1 flex items-center gap-2">
+                <span className="text-xs text-muted-foreground w-8 text-right flex-shrink-0">
+                  {formatTime(currentTime)}
+                </span>
+                <div className="w-full px-1">
+                  <Slider
+                    disabled={!audio}
+                    min={0}
+                    max={duration}
+                    step={0.1}
+                    value={[currentTime]}
+                    onValueChange={handleSeek}
+                  />
+                </div>
+                <span className="text-xs text-muted-foreground w-8 flex-shrink-0">
+                  {formatTime(duration)}
+                </span>
+              </div>
+
+              <AudioSettingsModal 
+                settings={settings} 
+                onSettingsChange={handleSettingsChange}
+                onSubmit={handleSettingsSubmit}
+              />
+            </div>
+          </div>
+          )
+        }
       </CardContent>
     </Card>
   )
