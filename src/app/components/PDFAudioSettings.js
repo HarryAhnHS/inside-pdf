@@ -41,7 +41,7 @@ const PDFAudioSettings = ({
         <DialogHeader>
           <DialogTitle>Audio Settings</DialogTitle>
           <DialogDescription>
-            Customize the voice, speed, and other settings for text-to-speech.
+            Customize the voice, speed, and temperature
           </DialogDescription>
         </DialogHeader>
         
