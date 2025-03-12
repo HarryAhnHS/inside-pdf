@@ -61,7 +61,7 @@ const AudioControls = ({ pageText }) => {
     }
   }, [audio])
 
-  const fetchAudio = async () => {
+  const fetchAudio = async (formData) => {
     try {
       setIsLoading(true)
       setIsPlaying(false)
@@ -74,12 +74,18 @@ const AudioControls = ({ pageText }) => {
         URL.revokeObjectURL(audioUrl)
       }
 
+      // Use formData if provided, otherwise use current settings
+      const requestData = formData || settings
+      console.log('Sending TTS request with settings:', requestData)  // Debug log
+      
       const response = await fetch(`/api/tts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           text: pageText,
-          ...settings,
+          voice: requestData.voice,
+          speed: requestData.speed,
+          temperature: requestData.temperature,
         }),
       })
 
@@ -138,6 +144,10 @@ const AudioControls = ({ pageText }) => {
     setSettings(newSettings)
   }
 
+  const handleSettingsSubmit = (formData) => {
+    fetchAudio(formData)
+  }
+
   if (isLoading) {
     return (
       <div className="w-full flex items-center justify-center pb-6">
@@ -189,8 +199,8 @@ const AudioControls = ({ pageText }) => {
 
             <AudioSettingsModal 
               settings={settings} 
-              onSettingsChange={handleSettingsChange} 
-              onRegenerate={fetchAudio} 
+              onSettingsChange={handleSettingsChange}
+              onSubmit={handleSettingsSubmit}
             />
           </div>
         </div>

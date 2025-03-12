@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form"
 export function AudioSettingsModal({ 
   settings, 
   onSettingsChange, 
-  onRegenerate 
+  onSubmit 
 }) {
   const [open, setOpen] = useState(false)
   
@@ -21,11 +21,9 @@ export function AudioSettingsModal({
   })
 
   const handleSubmit = (values) => {
-    onSettingsChange(values)
+    onSettingsChange(values) // Update settings locally
     setOpen(false)
-    if (onRegenerate) {
-      onRegenerate()
-    }
+    onSubmit(values) // Submit with new settings
   }
 
   return (
@@ -90,8 +88,8 @@ export function AudioSettingsModal({
                     </div>
                     <FormControl>
                       <Slider
-                        min={0.5}
-                        max={2}
+                        min={0.1}
+                        max={4.9}
                         step={0.1}
                         value={[field.value]}
                         onValueChange={(value) => field.onChange(value[0])}

@@ -13,6 +13,8 @@ export async function POST(request) {
     // Parse the body of the request
     const { text, voice, speed, temperature } = await request.json();
 
+    console.log("TTS API: ", { text, voice, speed, temperature })
+
     // Validation
     if (!text || !voice) {
       return new Response(
