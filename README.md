@@ -58,15 +58,23 @@ A modern web application that combines PDF viewing with AI-powered text-to-speec
 
 ## Design Decisions
 
-- **Component Architecture**: Modular components (PDFViewer, AudioControls, FileUpload) for better maintainability and reusability
+- **Component Architecture**: Modular components for better maintainability and reusability
 - **State Management**: React hooks for local state, keeping the implementation simple and efficient
+- **Single root layout**: Scalable, consistent, and reusable layout for components
+- **TTS Integration**: 
+  - For each change in pageText state, immediately request API for audio data to minimize waiting time
+  - 
 - **UI/UX**: 
-  - Clean, minimal interface with smooth animations
-  - Consistent design language using Shadcn open-source components + global tailwind css components
-  - Responsive layout
-  - Singla page layout, with component animation using GSAP
-  - Dark mode / light mode
+  - Tried to maintain a clean, minimal, intuitive interface with smooth experience using GSAP
+  - Consistent design language using Shadcn open-source components and global tailwind css components
+  - Responsive design
+  - Dark mode / light mode using themeProvider context in root layout
+- **Websocket API integration**:
+  - Event and dynamic pageText content means setup and cleanup at each textData render
+    - Use React hooks to manage the WebSocket lifecycle and keep logic separate from UI
+    - Cleaner and modular - separating concerns
+    - Close and reinitialize the WebSocket when textData updates.
+    - Ensure only one active WebSocket connection exists at a time.
 
-- **Performance**: 
-  - Dynamic imports for PDF viewer
-  - Blob audio streaming
+- **Security**: 
+  - environmental variables for sensitive data

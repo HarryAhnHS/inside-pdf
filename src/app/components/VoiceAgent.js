@@ -1,14 +1,28 @@
 "use client"
 
 import { useRef, useEffect } from "react"
-import { open as openEmbed } from '@play-ai/agent-web-sdk';
 import { gsap } from "gsap"
 
-const webEmbedId = process.env.PLAYAI_WEB_EMBED_ID;
+const myWs = new WebSocket('wss://api.play.ai/v1/talk/Agent-XP5tVPa8GDWym6j');
+
+/*
+ * [Agent Greeting]
+ * Do you have any questions about the text on this page?
+ *
+ * [Agent Prompt]
+ * Your only job is to answer questions about the current text on this page. 
+ * Base your answers on the current text on the page. 
+ * Try to keep your answers as concise as possible, while answering the root of the question comprehensively.  
+ * Do not do anything else than answer questions related to the current text on the page. 
+ * Do not offer to do anything else.
+ * After answering one question, ask if they have any more questions about the text on this page. 
+ * Repeat until they have no more questions, and then end the call immediately.
+ */
 
 const VoiceAgent = ({ isExpanded, text }) => {
   const containerRef = useRef(null)
   const contentRef = useRef(null)
+
 
   useEffect(() => {
     if (isExpanded) {
@@ -51,7 +65,7 @@ const VoiceAgent = ({ isExpanded, text }) => {
         ref={contentRef}
         className="px-6 pb-6 opacity-0"
       >
-        TOdo Embed here
+        TOdo Agent here
       </div>
     </div>
   )
