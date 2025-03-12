@@ -7,7 +7,7 @@ import "react-pdf/dist/Page/AnnotationLayer.css"
 import "react-pdf/dist/Page/TextLayer.css"
 
 import { Card, CardContent } from "@/components/ui/card"
-import AudioControls from "./AudioControls"
+import PDFAudioControls from "./PDFAudioControls"
 import PDFNavBar from "./PDFNavBar"
 import PDFViewContainer from "./PDFViewContainer"
 import { Button } from "@/components/ui/button"
@@ -16,7 +16,7 @@ import { ArrowLeft } from "lucide-react"
 // Configure PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
-const PDFViewer = ({ file, handleChangeFile }) => {
+const PDFDashboard = ({ file, handleChangeFile }) => {
   const [loading, setLoading] = useState(false)
   const [pageNumber, setPageNumber] = useState(1)
   const [numPages, setNumPages] = useState(null)
@@ -85,7 +85,7 @@ const PDFViewer = ({ file, handleChangeFile }) => {
             onPageChange={setPageNumber}
           />
           {/* Audio Controls */}
-          <AudioControls pageText={pageText}/>
+          <PDFAudioControls pageText={pageText}/>
           {/* PDF View Container */}
           <PDFViewContainer 
             file={file}
@@ -99,4 +99,4 @@ const PDFViewer = ({ file, handleChangeFile }) => {
   )
 }
 
-export default PDFViewer
+export default PDFDashboard

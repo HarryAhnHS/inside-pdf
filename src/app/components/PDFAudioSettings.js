@@ -9,11 +9,11 @@ import { Button } from "@/components/ui/button"
 import { Settings } from 'lucide-react'
 import { useForm } from "react-hook-form"
 
-export function AudioSettingsModal({ 
+const PDFAudioSettings = ({ 
   settings, 
   onSettingsChange, 
   onSubmit 
-}) {
+}) => {
   const [open, setOpen] = useState(false)
   
   const form = useForm({
@@ -143,3 +143,5 @@ export function AudioSettingsModal({
     </Dialog>
   )
 }
+
+export default PDFAudioSettings

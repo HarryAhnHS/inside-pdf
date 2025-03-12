@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 
 import FileUpload from './components/FileUpload';
-const PDFViewer = dynamic(() => import('./components/PDFViewer'), { ssr: false }); // Disable SSR PDFViewer by dynamically importing
+const PDFDashboard = dynamic(() => import('./components/PDFDashboard'), { ssr: false }); // Disable SSR PDFViewer by dynamically importing
 
 export default function Home() {
   const [file, setFile] = useState(null);
@@ -72,7 +72,7 @@ export default function Home() {
       {/* PDF Viewer */}
       {showPDFViewer && (
         <div className="w-full flex justify-center items-start">
-          <PDFViewer file={file} handleChangeFile={handleChangeFile} />
+          <PDFDashboard file={file} handleChangeFile={handleChangeFile} />
         </div>
       )}
     </div>

@@ -5,9 +5,9 @@ import { Play, Pause, Loader2, FileAudio } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Card, CardContent } from "@/components/ui/card"
-import { AudioSettingsModal } from "./AudioSettingsModal"
+import PDFAudioSettings from "./PDFAudioSettings"
 
-const AudioControls = ({ pageText }) => {
+const PDFAudioControls = ({ pageText }) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [audioUrl, setAudioUrl] = useState(null)
@@ -200,7 +200,7 @@ const AudioControls = ({ pageText }) => {
                 </span>
               </div>
 
-              <AudioSettingsModal 
+              <PDFAudioSettings 
                 settings={settings} 
                 onSettingsChange={handleSettingsChange}
                 onSubmit={handleSettingsSubmit}
@@ -214,4 +214,4 @@ const AudioControls = ({ pageText }) => {
   )
 }
 
-export default AudioControls
+export default PDFAudioControls
