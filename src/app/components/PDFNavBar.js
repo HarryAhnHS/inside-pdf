@@ -1,23 +1,54 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 const PDFNavBar = ({ pageNumber, numPages, onPageChange }) => {
-  const goToPage = (page) => {
-    if (page >= 1 && page <= numPages) {
-      onPageChange(page)
+  const [inputValue, setInputValue] = useState(pageNumber)
+  const [isFocused, setIsFocused] = useState(false)
+
+  // Update input value when pageNumber changes externally
+  useEffect(() => {
+    if (!isFocused) {
+      setInputValue(pageNumber)
     }
-  }
+  }, [pageNumber, isFocused])
 
   const goToPrevPage = () => onPageChange(pageNumber - 1 <= 1 ? 1 : pageNumber - 1)
   const goToNextPage = () => onPageChange(pageNumber + 1 >= numPages ? numPages : pageNumber + 1)
-
   const handleInputChange = (e) => {
-    const value = Number.parseInt(e.target.value)
-    if (!isNaN(value)) {
-      goToPage(value)
+    const value = e.target.value
+    setInputValue(value)
+  }
+
+  const goToPage = (page) => {
+    const validPage = Math.min(Math.max(1, page), numPages || 1)
+    if (validPage !== pageNumber) {
+      onPageChange(validPage)
+    }
+    setInputValue(validPage)
+  }
+
+  const handleInputFocus = () => {
+    setIsFocused(true)
+    setInputValue("")
+  }
+
+  const handleInputBlur = () => {
+    setIsFocused(false)
+    const newPage = Number.parseInt(inputValue)
+    if (!isNaN(newPage) && newPage > 0) {
+      goToPage(newPage)
+    } else {
+      setInputValue(pageNumber)
+    }
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.target.blur()
     }
   }
 
@@ -51,8 +82,11 @@ const PDFNavBar = ({ pageNumber, numPages, onPageChange }) => {
         <span className="text-xs text-muted-foreground text-nowrap">Page</span>
         <Input
           type="number"
-          value={pageNumber}
+          value={inputValue}
           onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
+          onKeyDown={handleKeyDown}
           min="1"
           max={numPages || 1}
           className="text-center !text-xs h-7 px-1"
