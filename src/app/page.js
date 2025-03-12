@@ -60,11 +60,11 @@ export default function Home() {
   };
 
   return (
-    <main>
+    <div className='h-full'>
       {/* File Upload */}
       <div 
         ref={fileUploadRef} 
-        className={`w-full transition-all flex justify-center items-center ${showPDFViewer ? 'hidden' : ''}`}
+        className={`h-full w-full transition-all flex justify-center items-center ${showPDFViewer ? 'hidden' : ''}`}
       >
         <FileUpload onFileChange={handleFileChange} />
       </div>
@@ -75,6 +75,6 @@ export default function Home() {
           <PDFViewer file={file} handleChangeFile={handleChangeFile} />
         </div>
       )}
-    </main>
+    </div>
   );
 }

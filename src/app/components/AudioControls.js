@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Play, Pause, Loader2 } from "lucide-react"
+import { Play, Pause, Loader2, FileAudio } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Card, CardContent } from "@/components/ui/card"
@@ -150,18 +150,22 @@ const AudioControls = ({ pageText }) => {
 
   return (
     <Card className="rounded-none border-none p-0 !bg-transparent shadow-none">
-      <CardContent className="px-12 py-4">
+      <CardContent className="px-8 py-4">
         {isLoading ? (
           <div className="w-full flex items-center justify-center">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-sm">Generating audio...</span>
+              <span className="text-sm">Processing audio...</span>
             </div>
           </div>
         )
         :
           (
           <div>
+            <div className="flex items-center gap-1 mb-2 text-muted-foreground text-xs">
+              <FileAudio className="h-3 w-3" />
+              <span>Audio</span>
+            </div>
             <div className="flex items-center gap-3">
               <Button
                 onClick={handlePlayPause}
