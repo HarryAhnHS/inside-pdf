@@ -26,7 +26,7 @@ const PlaybackSpeedButton = ({ disabled, playbackSpeed, onSpeedChange }) => {
           disabled={disabled}
           size="sm"
           variant="ghost"
-          className="h-8 px-1 text-xs font-medium flex items-center gap-1 text-muted-foreground hover:text-foreground"
+          className="h-8 px-2 text-xs font-medium flex items-center gap-1 text-muted-foreground hover:text-foreground"
         >
           {playbackSpeed}x
         </Button>

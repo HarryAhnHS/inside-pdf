@@ -1,27 +1,12 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Play, Pause, Loader2, FileAudio, Gauge } from "lucide-react"
+import { Play, Pause, Loader2, FileAudio } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Card, CardContent } from "@/components/ui/card"
 import PDFAudioSettings from "./PDFAudioSettings"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
-const PLAYBACK_SPEEDS = [
-  { value: 0.25, label: "0.25x" },
-  { value: 0.5, label: "0.5x" },
-  { value: 0.75, label: "0.75x" },
-  { value: 1, label: "1x" },
-  { value: 1.25, label: "1.25x" },
-  { value: 1.5, label: "1.5x" },
-  { value: 2, label: "2x" },
-]
+import PlaybackSpeedButton from "./PlaybackSpeedButton"
 
 const PDFAudioControls = ({ pageText }) => {
   const [isPlaying, setIsPlaying] = useState(false)
@@ -204,12 +189,12 @@ const PDFAudioControls = ({ pageText }) => {
     <Card className="rounded-none border-none p-0 !bg-transparent shadow-none">
       <CardContent className="px-8 py-4">
         {isLoading ? (
-          <div className="w-full flex-col items-center justify-center text-muted-foreground">
-            <div className="flex justify-center items-center gap-2">
+          <div className="w-full flex items-center justify-center">
+            <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
               <span className="text-sm">Processing audio...</span>
+              <div className="text-xs italic">It may take a while for the audio to load.</div>
             </div>
-            <p className="text-center text-xs italic">It may take a while for the audio to load.</p>
           </div>
         )
         :
@@ -219,7 +204,8 @@ const PDFAudioControls = ({ pageText }) => {
               <FileAudio className="h-3 w-3" />
               <span>Audio</span>
             </div>
-            <div className="flex items-center gap-3">
+            {/* Audio player */}
+            <div className="flex items-center">
               <Button
                 onClick={handlePlayPause}
                 disabled={!audioUrl}
@@ -234,11 +220,12 @@ const PDFAudioControls = ({ pageText }) => {
                 )}
               </Button>
 
+                {/* Player progress slider bar */}
               <div className="flex-1 flex items-center gap-2">
                 <span className="text-xs text-muted-foreground w-8 text-right flex-shrink-0">
                   {formatTime(currentTime)}
                 </span>
-                <div className="w-full px-1">
+                <div className="flex-1 px-1">
                   <Slider
                     disabled={!audio}
                     min={0}
@@ -254,29 +241,11 @@ const PDFAudioControls = ({ pageText }) => {
               </div>
 
               <div className="flex items-center">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      disabled={!audioUrl}
-                      size="sm"
-                      variant="ghost"
-                      className="h-8 px-1 text-xs font-medium flex items-center gap-1 text-muted-foreground hover:text-foreground"
-                    >
-                        {playbackSpeed}x
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start">
-                    {PLAYBACK_SPEEDS.map((speed) => (
-                      <DropdownMenuItem
-                        key={speed.value}
-                        onClick={() => handleSpeedChange(speed.value)}
-                        className="text-xs"
-                      >
-                        {speed.label}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <PlaybackSpeedButton 
+                  disabled={!audioUrl}
+                  playbackSpeed={playbackSpeed}
+                  onSpeedChange={handleSpeedChange}
+                />
                 <PDFAudioSettings 
                   settings={settings} 
                   onSettingsChange={handleSettingsChange}
