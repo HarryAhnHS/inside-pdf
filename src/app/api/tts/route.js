@@ -1,8 +1,8 @@
 import voices from '../../models/voices';
 import axios from 'axios';
 
-const PLAYAI_API_KEY = process.env.PLAYAI_API_KEY;
-const PLAYAI_USER_ID = process.env.PLAYAI_USER_ID;
+const PLAYAI_API_KEY = process.env.NEXT_PUBLIC_PLAYAI_API_KEY;
+const PLAYAI_USER_ID = process.env.NEXT_PUBLIC_PLAYAI_USER_ID;
 const PLAYAI_API_URL = 'https://api.play.ai/api/v1/tts/stream';
 
 // POST request handler

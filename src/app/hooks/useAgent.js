@@ -1,68 +1,207 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 
 const PLAYAI_WS_URL = "wss://api.play.ai/v1/talk/";
-const agentId = process.env.PLAYAI_AGENT_ID;
-const apiKey = process.env.PLAYAI_API_KEY;
+const agentId = process.env.NEXT_PUBLIC_PLAYAI_AGENT_ID;
+const apiKey = process.env.NEXT_PUBLIC_PLAYAI_AGENT_API_KEY;
 
-// Custom hook to manage the WebSocket connection using ddynamic text data
-const useAgent = (textData) => {
-    const [isConnected, setIsConnected] = useState(false);
-    const [audioChunks, setAudioChunks] = useState([]);
+export function useAgent(textData) {
+    const [isRecording, setIsRecording] = useState(false);
+    const [isSpeaking, setIsSpeaking] = useState(false);
     const wsRef = useRef(null);
+    const mediaRecorderRef = useRef(null);
+    const audioStreamRef = useRef(null);
+    const audioBuffersRef = useRef([]);
+    const audioElementRef = useRef(null);
+    const mediaSourceRef = useRef(null);
+    const sourceBufferRef = useRef(null);
 
-    useEffect(() => {
-        if (!apiKey || !agentId || !textData) return;
-
-        // Close existing WebSocket before opening a new one
-        if (wsRef.current) {
-            wsRef.current.close();
+    const initializeMediaSource = () => {
+        if (!audioElementRef.current) {
+            audioElementRef.current = new Audio();
+            audioElementRef.current.autoplay = true;
         }
 
-        const ws = new WebSocket(`${PLAYAI_WS_URL}${agentId}`);
-        wsRef.current = ws;
+        if (!mediaSourceRef.current) {
+            mediaSourceRef.current = new MediaSource();
+            audioElementRef.current.src = URL.createObjectURL(mediaSourceRef.current);
 
-        ws.onopen = () => {
-            console.log("connected!");
-            setIsConnected(true);
-            
-            // Send setup message with textData
-            ws.send(
-            JSON.stringify({ 
-                type: "setup", 
-                apiKey, 
-                outputSampleRate: 24000, // To reduce latency
-                prompt: `The current text on the page is: ${textData}. Only use this text to answer the user's question.`, // Feed dynamic data
-            })
-            );
-        };
-
-        // Receive audio stream from ws server
-        ws.onmessage = (message) => {
-            const event = JSON.parse(message);
-
-            if (event.type === "audioStream") {
-            setAudioChunks((prev) => [...prev, message.data]);
-            return;
-            } 
-        };
-
-        // Handle errors and closed connection
-        ws.onerror = (error) => console.error("WebSocket Error:", error);
-        ws.onclose = () => setIsConnected(false);
-
-        return () => {
-            // Cleanup on unmount
-            ws.close();
-            setIsConnected(false);
-        };
-    }, [textData]); // Restart WebSocket when textData changes
-
-    // Helper to audio stream to ws server in base64 format
-    const sendAudio = (base64Data) => {
-        wsRef.current?.send(JSON.stringify({ type: "audioIn", data: base64Data }));
+            mediaSourceRef.current.addEventListener('sourceopen', () => {
+                if (!sourceBufferRef.current) {
+                    sourceBufferRef.current = mediaSourceRef.current.addSourceBuffer('audio/mpeg');
+                    sourceBufferRef.current.mode = 'sequence';
+                    
+                    sourceBufferRef.current.addEventListener('updateend', () => {
+                        if (audioBuffersRef.current.length > 0 && !sourceBufferRef.current.updating) {
+                            const nextBuffer = audioBuffersRef.current.shift();
+                            sourceBufferRef.current.appendBuffer(nextBuffer);
+                        }
+                    });
+                }
+            });
+        }
     };
 
-  return { isConnected, audioChunks, sendAudio };
-}
+    const startRecording = async () => {
+        if (!navigator.mediaDevices?.getUserMedia) {
+            console.error("MediaDevices API not supported.");
+            return;
+        }
 
-export default useAgent;
+        console.log("Starting recording...");
+
+        try {
+            // Initialize media source before connecting
+            initializeMediaSource();
+
+            console.log("Connecting WebSocket to:", `${PLAYAI_WS_URL}${agentId}`);
+            const ws = new WebSocket(`${PLAYAI_WS_URL}${agentId}`);
+            wsRef.current = ws;
+
+            ws.onopen = () => {
+                console.log("WebSocket connected! Sending setup...");
+                ws.send(
+                    JSON.stringify({
+                        type: "setup",
+                        apiKey,
+                        outputFormat: "mp3",
+                        outputSampleRate: 24000,
+                        prompt: `The current text on the page is: ${textData}. Answer questions based only on this text.`,
+                    })
+                );
+                setIsRecording(true);
+                startMediaRecorder();
+            };
+
+            ws.onmessage = async (message) => {
+                try {
+                    const event = JSON.parse(message.data);
+                    
+                    if (event.type === "voiceActivityStart") {
+                        console.log("Detected voice activity start!");
+                        setIsSpeaking(true);
+                    }
+            
+                    if (event.type === "voiceActivityEnd") {
+                        console.log("Detected voice activity end!");
+                        setIsSpeaking(false);
+                    }
+            
+                    if (event.type === "audioStream" && event.data) {
+                        try {
+                            const audioData = decodeBase64ToUint8Array(event.data);
+                            if (sourceBufferRef.current && !sourceBufferRef.current.updating) {
+                                sourceBufferRef.current.appendBuffer(audioData);
+                            } else if (sourceBufferRef.current) {
+                                audioBuffersRef.current.push(audioData);
+                            }
+                        } catch (err) {
+                            console.error("Error processing audio chunk:", err);
+                        }
+                    }
+                } catch (error) {
+                    console.error("WebSocket message parse error:", error);
+                }
+            };            
+
+            ws.onerror = (error) => console.error("WebSocket Error:", error);
+            ws.onclose = () => {
+                console.log("WebSocket closed");
+                cleanupMediaSource();
+            };
+        } catch (error) {
+            console.error("Error starting recording:", error);
+            stopRecording();
+        }
+    };
+
+    const startMediaRecorder = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioStreamRef.current = stream;
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+
+            mediaRecorder.ondataavailable = async (event) => {
+                if (wsRef.current?.readyState === WebSocket.OPEN) {
+                    const base64Data = await blobToBase64(event.data);
+                    sendAudio(base64Data);
+                } else {
+                    console.warn("WebSocket is not ready, discarding audio data.");
+                }
+            };
+
+            mediaRecorder.start(500);
+        } catch (error) {
+            console.error("Error accessing microphone:", error);
+        }
+    };
+
+    const cleanupMediaSource = () => {
+        if (sourceBufferRef.current && mediaSourceRef.current) {
+            try {
+                if (mediaSourceRef.current.readyState === 'open') {
+                    mediaSourceRef.current.endOfStream();
+                }
+            } catch (error) {
+                console.error("Error ending media stream:", error);
+            }
+        }
+
+        if (audioElementRef.current) {
+            audioElementRef.current.pause();
+            audioElementRef.current = null;
+        }
+
+        sourceBufferRef.current = null;
+        mediaSourceRef.current = null;
+        audioBuffersRef.current = [];
+    };
+
+    const stopRecording = () => {
+        console.log("Stopping recording...");
+        setIsRecording(false);
+        setIsSpeaking(false);
+
+        if (mediaRecorderRef.current) {
+            mediaRecorderRef.current.stop();
+            mediaRecorderRef.current = null;
+        }
+
+        if (audioStreamRef.current) {
+            audioStreamRef.current.getTracks().forEach(track => track.stop());
+            audioStreamRef.current = null;
+        }
+
+        if (wsRef.current) {
+            wsRef.current.close();
+            wsRef.current = null;
+        }
+
+        cleanupMediaSource();
+    };
+
+    const sendAudio = (base64Data) => {
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+            wsRef.current.send(JSON.stringify({ type: "audioIn", data: base64Data }));
+        }
+    };
+
+    const decodeBase64ToUint8Array = (base64) => {
+        const binaryString = atob(base64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes.buffer;
+    };
+
+    const blobToBase64 = (blob) => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        });
+    };
+
+    return { isRecording, isSpeaking, startRecording, stopRecording };
+}

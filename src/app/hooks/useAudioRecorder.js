@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 
-const useAudioRecorder = (sendAudio) => {
+export function useAudioRecorder(sendAudio) {
     const [isRecording, setIsRecording] = useState(false);
     const mediaRecorderRef = useRef(null);
 
@@ -43,5 +43,3 @@ async function blobToBase64(blob) {
         reader.onloadend = () => resolve(reader.result.split(",")[1]);
     });
 }
-
-export default useAudioRecorder;
