@@ -4,11 +4,15 @@ import { useRef, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 
 import FileUpload from './components/FileUpload';
+import ChatBox from './components/ChatBox';
 const PDFDashboard = dynamic(() => import('./components/PDFDashboard'), { ssr: false }); // Disable SSR PDFViewer by dynamically importing
 
 export default function Home() {
   const [file, setFile] = useState(null);
   const [showPDFViewer, setShowPDFViewer] = useState(false);
+  const [isChatExpanded, setIsChatExpanded] = useState(false);
+  const [pageText, setPageText] = useState("");
+  const [fullPdfText, setFullPdfText] = useState("");
   const fileUploadRef = useRef(null);
 
   const animateFileUpload = (element) => {
@@ -45,6 +49,8 @@ export default function Home() {
       
       setFile(uploadedFile);
       setShowPDFViewer(true);
+      setPageText("");
+      setFullPdfText("");
     } else {
       alert('Please upload a valid PDF file.');
     }
@@ -54,6 +60,8 @@ export default function Home() {
     // Animate out PDFViewer
     setShowPDFViewer(false);
     setFile(null);
+    setPageText("");
+    setFullPdfText("");
     
     // Reset and show FileUpload with animation
     animateFileUpload(fileUploadRef.current);
@@ -72,9 +80,24 @@ export default function Home() {
       {/* PDF Viewer */}
       {showPDFViewer && (
         <div className="w-full flex justify-center items-start">
-          <PDFDashboard file={file} handleChangeFile={handleChangeFile} />
+          <PDFDashboard 
+            file={file} 
+            handleChangeFile={handleChangeFile}
+            onPageTextChange={setPageText}
+            onFullPdfTextChange={setFullPdfText}
+            isChatExpanded={isChatExpanded}
+            onChatToggle={() => setIsChatExpanded(!isChatExpanded)}
+          />
         </div>
       )}
+
+      {/* Chat Box */}
+      <ChatBox 
+        isExpanded={isChatExpanded} 
+        pageText={pageText}
+        fullPdfText={fullPdfText}
+        onClose={() => setIsChatExpanded(false)} 
+      />
     </div>
   );
 }

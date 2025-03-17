@@ -4,13 +4,31 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Loader2, Send } from "lucide-react";
+import { Loader2, Send, X, GripVertical } from "lucide-react";
+import { gsap } from "gsap";
+import Draggable from "react-draggable";
+import { Resizable } from "react-resizable";
+import "react-resizable/css/styles.css";
 
-export default function ChatBox({ pageText }) {
+export default function ChatBox({ isExpanded, pageText, fullPdfText, onClose }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
+    const [dimensions, setDimensions] = useState({ width: 400, height: 500 });
+    const [position, setPosition] = useState({ x: 0, y: 0 });
     const messagesEndRef = useRef(null);
+    const containerRef = useRef(null);
+    const nodeRef = useRef(null);
+
+    // Initialize position on client-side only
+    useEffect(() => {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        setPosition({
+            x: vw * 0.1, // 10% from left
+            y: vh * 0.1  // 10% from top
+        });
+    }, []);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -19,6 +37,36 @@ export default function ChatBox({ pageText }) {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    // Expansion animation
+    useEffect(() => {
+        if (isExpanded) {
+            gsap.to(containerRef.current, {
+                opacity: 1,
+                duration: 0.3,
+                ease: "power3.out"
+            });
+        } else {
+            gsap.to(containerRef.current, {
+                opacity: 0,
+                duration: 0.3,
+                ease: "power3.in"
+            });
+        }
+    }, [isExpanded]);
+
+    const handleResize = (event, { size }) => {
+        setDimensions({
+            width: size.width,
+            height: size.height
+        });
+    };
+
+    const handleClose = () => {
+        if (onClose) {
+            onClose();
+        }
+    };
 
     const handleSend = async () => {
         if (!input.trim() || loading) return;
@@ -36,7 +84,8 @@ export default function ChatBox({ pageText }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     messages: updatedMessages,
-                    pageText
+                    pageText,
+                    fullPdfText
                 })
             });
 
@@ -71,49 +120,94 @@ export default function ChatBox({ pageText }) {
     };
 
     return (
-        <Card className="w-full max-w-2xl mx-auto p-4">
-            <div className="space-y-4">
-                <div className="h-[400px] overflow-y-auto space-y-4 p-4">
-                    {messages.map((message, index) => (
-                        <div
-                            key={index}
-                            className={`flex ${
-                                message.role === "user" ? "justify-end" : "justify-start"
-                            }`}
-                        >
-                            <div
-                                className={`max-w-[80%] rounded-lg p-3 ${
-                                    message.role === "user"
-                                        ? "bg-primary text-primary-foreground"
-                                        : "bg-muted"
-                                }`}
-                            >
-                                {message.content}
-                            </div>
-                        </div>
-                    ))}
-                    <div ref={messagesEndRef} />
-                </div>
-                <div className="flex gap-2">
-                    <Input
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Type your message..."
-                        disabled={loading}
-                    />
-                    <Button 
-                        onClick={handleSend} 
-                        disabled={loading || !input.trim()}
+        <div className="fixed inset-0 pointer-events-none z-50">
+            <Draggable
+                nodeRef={nodeRef}
+                handle=".drag-handle"
+                bounds="parent"
+                position={position}
+                onStop={(e, data) => setPosition({ x: data.x, y: data.y })}
+            >
+                <div
+                    ref={nodeRef}
+                    className="pointer-events-auto"
+                    style={{
+                        display: isExpanded ? 'block' : 'none',
+                        width: dimensions.width,
+                        height: dimensions.height
+                    }}
+                >
+                    <Resizable
+                        width={dimensions.width}
+                        height={dimensions.height}
+                        onResize={handleResize}
+                        minConstraints={[300, 400]}
+                        maxConstraints={[800, 800]}
                     >
-                        {loading ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                            <Send className="h-4 w-4" />
-                        )}
-                    </Button>
+                        <Card className="w-full h-full flex flex-col py-1 gap-0 bg-background/95 backdrop-blur-sm">
+                            <div className="flex items-center justify-between p-2 border-b">
+                                <div className="flex items-center gap-2 cursor-move drag-handle">
+                                    <GripVertical className="h-4 w-4 text-muted-foreground" />
+                                    <span className="text-sm font-medium">Chat with AI about this page</span>
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={handleClose}
+                                    className="h-8 w-8"
+                                >
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
+                            <div className="flex-1 overflow-hidden">
+                                <div className="h-full overflow-y-auto p-4 space-y-4">
+                                    {messages.map((message, index) => (
+                                        <div
+                                            key={index}
+                                            className={`flex ${
+                                                message.role === "user" ? "justify-end" : "justify-start"
+                                            }`}
+                                        >
+                                            <div
+                                                className={`max-w-[80%] rounded-lg p-3 break-words text-sm leading-relaxed ${
+                                                    message.role === "user"
+                                                        ? "bg-primary text-primary-foreground"
+                                                        : "bg-muted"
+                                                }`}
+                                            >
+                                                {message.content}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <div ref={messagesEndRef} />
+                                </div>
+                            </div>
+                            <div className="p-4 border-t">
+                                <div className="flex gap-2">
+                                    <Input
+                                        value={input}
+                                        onChange={(e) => setInput(e.target.value)}
+                                        onKeyDown={handleKeyDown}
+                                        placeholder="Type your message..."
+                                        disabled={loading}
+                                        className="text-sm"
+                                    />
+                                    <Button 
+                                        onClick={handleSend} 
+                                        disabled={loading || !input.trim()}
+                                    >
+                                        {loading ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Send className="h-4 w-4" />
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
+                        </Card>
+                    </Resizable>
                 </div>
-            </div>
-        </Card>
+            </Draggable>
+        </div>
     );
 }
