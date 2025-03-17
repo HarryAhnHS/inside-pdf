@@ -13,8 +13,7 @@ import { ArrowLeft, Wand2, X } from "lucide-react"
 import PDFAudioControls from "./PDFAudioControls"
 import PDFNavBar from "./PDFNavBar"
 import PDFViewContainer from "./PDFViewContainer"
-import VoiceAgent from "./VoiceAgent"
-
+import ChatBox from "./ChatBox"
 
 // Configure PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
@@ -24,7 +23,7 @@ const PDFDashboard = ({ file, handleChangeFile }) => {
   const [pageNumber, setPageNumber] = useState(1)
   const [numPages, setNumPages] = useState(null)
   const [pageText, setPageText] = useState("")
-  const [isVoiceAgentExpanded, setIsVoiceAgentExpanded] = useState(false)
+  const [isChatExpanded, setIsChatExpanded] = useState(false)
   const containerRef = useRef(null)
 
   useEffect(() => {
@@ -77,19 +76,19 @@ const PDFDashboard = ({ file, handleChangeFile }) => {
           <ArrowLeft className="h-4 w-4" />
           Change File
         </Button>
-        {/* Voice Agent Button */}
+        {/* Chat Button */}
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setIsVoiceAgentExpanded(!isVoiceAgentExpanded)}
+          onClick={() => setIsChatExpanded(!isChatExpanded)}
           className="h-8 px-4 text-xs text-muted-foreground hover:text-foreground"
         >
-          {isVoiceAgentExpanded ? (
+          {isChatExpanded ? (
             <X className="h-4 w-4" />
           ) : (
             <Wand2 className="h-4 w-4" />
           )}
-          {isVoiceAgentExpanded ? (
+          {isChatExpanded ? (
             'Hide AI'
           ) : (
             'Ask AI'
@@ -97,14 +96,15 @@ const PDFDashboard = ({ file, handleChangeFile }) => {
         </Button>
       </div>
       
-      {/* Voice Agent Expandable Section */}
-      <VoiceAgent 
-        isExpanded={isVoiceAgentExpanded}
-        text={pageText}
-      />
+      {/* Chat Box Expandable Section */}
+      {isChatExpanded && (
+        <div className="mb-4">
+          <ChatBox pageText={pageText} />
+        </div>
+      )}
       
       <Card 
-      className="w-full max-w-2xl mx-auto shadow overflow-hidden pt-0 pb-12 bg-muted/20"
+        className="w-full max-w-2xl mx-auto shadow overflow-hidden pt-0 pb-12 bg-muted/20"
       >
         <CardContent className="p-0">
           {/* Navbar */}
