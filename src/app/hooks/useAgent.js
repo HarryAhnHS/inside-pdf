@@ -6,7 +6,8 @@ const apiKey = process.env.NEXT_PUBLIC_PLAYAI_AGENT_API_KEY;
 
 export function useAgent(textData) {
     const [isRecording, setIsRecording] = useState(false);
-    const [isSpeaking, setIsSpeaking] = useState(false);
+    const [agentState, setAgentState] = useState("idle"); // "idle" | "thinking" | "speaking"
+    const [currentMessage, setCurrentMessage] = useState("");
     const wsRef = useRef(null);
     const mediaRecorderRef = useRef(null);
     const audioStreamRef = useRef(null);
@@ -47,10 +48,11 @@ export function useAgent(textData) {
             return;
         }
 
+        setCurrentMessage("");
+        setAgentState("idle");
         console.log("Starting recording...");
 
         try {
-            // Initialize media source before connecting
             initializeMediaSource();
 
             console.log("Connecting WebSocket to:", `${PLAYAI_WS_URL}${agentId}`);
@@ -65,7 +67,7 @@ export function useAgent(textData) {
                         apiKey,
                         outputFormat: "mp3",
                         outputSampleRate: 24000,
-                        prompt: `The current text on the page is: ${textData}. Answer questions based only on this text.`,
+                        prompt: `The current text on the page is: ${textData}. Answer questions about this text.`,
                     })
                 );
                 setIsRecording(true);
@@ -75,15 +77,31 @@ export function useAgent(textData) {
             ws.onmessage = async (message) => {
                 try {
                     const event = JSON.parse(message.data);
+                    console.log("Event:", event);
                     
                     if (event.type === "voiceActivityStart") {
-                        console.log("Detected voice activity start!");
-                        setIsSpeaking(true);
+                        console.log("User started speaking!");
+                        setAgentState("thinking");
                     }
             
                     if (event.type === "voiceActivityEnd") {
-                        console.log("Detected voice activity end!");
-                        setIsSpeaking(false);
+                        console.log("User stopped speaking!");
+                        // Keep agent in thinking state until audio starts
+                    }
+
+                    if (event.type === "audioStreamStart") {
+                        console.log("Agent started speaking!");
+                        setAgentState("speaking");
+                    }
+
+                    if (event.type === "audioStreamEnd") {
+                        console.log("Agent finished speaking!");
+                        setAgentState("idle");
+                        setCurrentMessage(event.message || "");
+                        if (event.message?.toLowerCase().includes("goodbye") || 
+                            event.message?.toLowerCase().includes("end the call")) {
+                            stopRecording();
+                        }
                     }
             
                     if (event.type === "audioStream" && event.data) {
@@ -106,6 +124,9 @@ export function useAgent(textData) {
             ws.onerror = (error) => console.error("WebSocket Error:", error);
             ws.onclose = () => {
                 console.log("WebSocket closed");
+                setIsRecording(false);
+                setAgentState("idle");
+                setCurrentMessage("");
                 cleanupMediaSource();
             };
         } catch (error) {
@@ -160,7 +181,8 @@ export function useAgent(textData) {
     const stopRecording = () => {
         console.log("Stopping recording...");
         setIsRecording(false);
-        setIsSpeaking(false);
+        setAgentState("idle");
+        setCurrentMessage("");
 
         if (mediaRecorderRef.current) {
             mediaRecorderRef.current.stop();
@@ -203,5 +225,11 @@ export function useAgent(textData) {
         });
     };
 
-    return { isRecording, isSpeaking, startRecording, stopRecording };
+    return { 
+        isRecording, 
+        agentState,
+        currentMessage,
+        startRecording, 
+        stopRecording 
+    };
 }
