@@ -8,7 +8,7 @@ import "react-pdf/dist/Page/TextLayer.css"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Wand2, X } from "lucide-react"
+import { ArrowLeft, Wand2, X, FileAudio } from "lucide-react"
 
 import PDFAudioControls from "./PDFAudioControls"
 import PDFNavBar from "./PDFNavBar"
@@ -30,7 +30,9 @@ const PDFDashboard = ({
   const [pageNumber, setPageNumber] = useState(1)
   const [numPages, setNumPages] = useState(null)
   const [currentPageText, setCurrentPageText] = useState("")
+  const [isAudioExpanded, setIsAudioExpanded] = useState(true)
   const containerRef = useRef(null)
+  const audioControlsRef = useRef(null)
 
   useEffect(() => {
     // Initial animation when component mounts
@@ -47,6 +49,35 @@ const PDFDashboard = ({
       }
     )
   }, [])
+
+  // Handle audio controls toggle
+  const handleAudioToggle = () => {
+    setIsAudioExpanded(!isAudioExpanded)
+    if (isAudioExpanded) {
+      // Collapse
+      gsap.to(audioControlsRef.current, {
+        height: 0,
+        opacity: 0,
+        duration: 0.3,
+        ease: "power2.inOut",
+        onComplete: () => {
+          audioControlsRef.current.style.display = 'none'
+        }
+      })
+    } else {
+      // Expand
+      audioControlsRef.current.style.display = 'block'
+      gsap.fromTo(audioControlsRef.current,
+        { height: 0, opacity: 0 },
+        {
+          height: 'auto',
+          opacity: 1,
+          duration: 0.3,
+          ease: "power2.inOut"
+        }
+      )
+    }
+  }
 
   // Handle page number changes
   const handlePageChange = (newPageNumber) => {
@@ -142,9 +173,13 @@ const PDFDashboard = ({
             pageNumber={pageNumber}
             numPages={numPages}
             onPageChange={handlePageChange}
+            isAudioExpanded={isAudioExpanded}
+            onAudioToggle={handleAudioToggle}
           />
           {/* Audio Controls */}
-          <PDFAudioControls pageText={currentPageText}/>
+          <div ref={audioControlsRef} className="overflow-hidden">
+            <PDFAudioControls pageText={currentPageText}/>
+          </div>
           {/* PDF View Container */}
           <PDFViewContainer 
             file={file}
