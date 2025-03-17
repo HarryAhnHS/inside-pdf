@@ -15,6 +15,7 @@ export default function Home() {
   const [fullPdfText, setFullPdfText] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const fileUploadRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const animateFileUpload = (element) => {
     return gsap.fromTo(element,
@@ -68,6 +69,11 @@ export default function Home() {
     setPageNumber(1);
     setIsChatExpanded(false); // Close chat when changing files
     
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    
     // Reset and show FileUpload with animation
     animateFileUpload(fileUploadRef.current);
   };
@@ -79,7 +85,7 @@ export default function Home() {
         ref={fileUploadRef} 
         className={`h-full w-full transition-all flex justify-center items-center ${showPDFViewer ? 'hidden' : ''}`}
       >
-        <FileUpload onFileChange={handleFileUpload} />
+        <FileUpload onFileChange={handleFileUpload} fileInputRef={fileInputRef} file={file}/>
       </div>
 
       {/* PDF Viewer */}

@@ -45,8 +45,9 @@ export async function POST(request) {
         messages: [
           { 
             role: "system", 
-            content: `You are an AI assistant that ONLY answers questions about the following pdf with this text:\n\n${fullPdfText}\n\n. 
+            content: `You are an AI assistant that ONLY answers questions about the following pdf with this full text:\n\n${fullPdfText}\n\n. 
             The current page on that pdf has this text:\n\n${pageText}\n\n and that page number is ${pageNumber}. 
+            You can determine the page number of the text by looking at the "--- Page # ---" divider marked at the start of each page's text.
             If the question is unrelated, respond with "I can only answer questions about the given text."`
           },
           ...messages

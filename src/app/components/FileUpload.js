@@ -5,9 +5,8 @@ import { Upload, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
-const FileUpload = ({ onFileChange }) => {
+const FileUpload = ({ onFileChange, fileInputRef, file }) => {
   const [dragActive, setDragActive] = useState(false)
-  const [selectedFile, setSelectedFile] = useState(null)
 
   const handleDrag = (e) => {
     e.preventDefault()
@@ -26,7 +25,6 @@ const FileUpload = ({ onFileChange }) => {
 
     const file = e.dataTransfer.files[0]
     if (file && file.type === 'application/pdf') {
-      setSelectedFile(file)
       onFileChange({ target: { files: [file] } })
     }
   }
@@ -34,7 +32,6 @@ const FileUpload = ({ onFileChange }) => {
   const handleChange = (e) => {
     const file = e.target.files[0]
     if (file) {
-      setSelectedFile(file)
       onFileChange(e)
     }
   }
@@ -54,6 +51,7 @@ const FileUpload = ({ onFileChange }) => {
           onDrop={handleDrop}
         >
           <input
+            ref={fileInputRef}
             type="file"
             accept="application/pdf"
             onChange={handleChange}
@@ -66,7 +64,7 @@ const FileUpload = ({ onFileChange }) => {
             </div>
             <div className="space-y-1">
               <p className="text-base font-medium">
-                {selectedFile ? selectedFile.name : "Drop your PDF here"}
+                {file ? file.name : "Drop your PDF here"}
               </p>
               <p className="text-sm text-muted-foreground">
                   or click to browse
