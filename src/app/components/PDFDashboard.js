@@ -22,13 +22,14 @@ const PDFDashboard = ({
   handleChangeFile, 
   onPageTextChange,
   isChatExpanded,
-  onChatToggle 
+  onChatToggle,
+  onFullPdfTextChange,
+  onPageChange
 }) => {
   const [loading, setLoading] = useState(false)
   const [pageNumber, setPageNumber] = useState(1)
   const [numPages, setNumPages] = useState(null)
   const [currentPageText, setCurrentPageText] = useState("")
-  const [fullPdfText, setFullPdfText] = useState("")
   const containerRef = useRef(null)
 
   useEffect(() => {
@@ -47,9 +48,17 @@ const PDFDashboard = ({
     )
   }, [])
 
+  // Handle page number changes
+  const handlePageChange = (newPageNumber) => {
+    setPageNumber(newPageNumber)
+    if (onPageChange) {
+      onPageChange(newPageNumber)
+    }
+  }
+
+  // Extract full PDF text when new document loads
   const onDocumentLoadSuccess = async ({ numPages }) => {
     setNumPages(numPages)
-    // Extract full PDF text when document loads
     try {
       const arrayBuffer = await file.arrayBuffer()
       const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise
@@ -60,15 +69,19 @@ const PDFDashboard = ({
         const page = await pdf.getPage(i)
         const tokenizedText = await page.getTextContent()
         const pageText = tokenizedText.items.map((token) => token.str).join(" ")
-        fullText += pageText + "\n\n" // Add double newline between pages
+        
+        // Add page number and clear boundary
+        fullText += `\n\n--- Page ${i} ---\n\n${pageText}\n\n`
       }
       
-      setFullPdfText(fullText)
-    } catch (error) {
+      onFullPdfTextChange(fullText)
+    } 
+    catch (error) {
       console.error("Failed to extract full PDF text:", error)
     }
   }
 
+  // Extract text from current page when it renders
   const onRenderSuccess = async ({ pageNumber }) => {
     setLoading(true)
     try {
@@ -128,7 +141,7 @@ const PDFDashboard = ({
           <PDFNavBar 
             pageNumber={pageNumber}
             numPages={numPages}
-            onPageChange={setPageNumber}
+            onPageChange={handlePageChange}
           />
           {/* Audio Controls */}
           <PDFAudioControls pageText={currentPageText}/>

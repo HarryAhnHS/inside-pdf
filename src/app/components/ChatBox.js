@@ -5,19 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Loader2, Send, X, GripVertical } from "lucide-react";
-import { gsap } from "gsap";
 import Draggable from "react-draggable";
 import { Resizable } from "react-resizable";
 import "react-resizable/css/styles.css";
 
-export default function ChatBox({ isExpanded, pageText, fullPdfText, onClose }) {
+export default function ChatBox({ isExpanded, pageText, fullPdfText, pageNumber, onClose }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [dimensions, setDimensions] = useState({ width: 400, height: 500 });
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const messagesEndRef = useRef(null);
-    const containerRef = useRef(null);
     const nodeRef = useRef(null);
 
     // Initialize position on client-side only
@@ -37,23 +35,6 @@ export default function ChatBox({ isExpanded, pageText, fullPdfText, onClose }) 
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
-
-    // Expansion animation
-    useEffect(() => {
-        if (isExpanded) {
-            gsap.to(containerRef.current, {
-                opacity: 1,
-                duration: 0.3,
-                ease: "power3.out"
-            });
-        } else {
-            gsap.to(containerRef.current, {
-                opacity: 0,
-                duration: 0.3,
-                ease: "power3.in"
-            });
-        }
-    }, [isExpanded]);
 
     const handleResize = (event, { size }) => {
         setDimensions({
@@ -85,7 +66,8 @@ export default function ChatBox({ isExpanded, pageText, fullPdfText, onClose }) 
                 body: JSON.stringify({
                     messages: updatedMessages,
                     pageText,
-                    fullPdfText
+                    fullPdfText,
+                    pageNumber
                 })
             });
 
@@ -116,6 +98,9 @@ export default function ChatBox({ isExpanded, pageText, fullPdfText, onClose }) 
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             handleSend();
+        }
+        if (e.key === "Escape") {
+            handleClose();
         }
     };
 
@@ -148,7 +133,7 @@ export default function ChatBox({ isExpanded, pageText, fullPdfText, onClose }) 
                             <div className="flex items-center justify-between p-2 border-b">
                                 <div className="flex items-center gap-2 cursor-move drag-handle">
                                     <GripVertical className="h-4 w-4 text-muted-foreground" />
-                                    <span className="text-sm font-medium">Chat with AI about this page</span>
+                                    <span className="text-sm font-medium">Chat with AI about page {pageNumber}</span>
                                 </div>
                                 <Button
                                     variant="ghost"

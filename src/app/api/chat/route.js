@@ -14,9 +14,8 @@ export async function OPTIONS() {
 export async function POST(request) {
   try {
     console.log("Chat API: Received request");
-    const { messages, pageText } = await request.json();
+    const { messages, pageText, fullPdfText, pageNumber } = await request.json();
     console.log("Chat API: Messages:", messages);
-    console.log("Chat API: Page Text:", pageText);
 
     if (!messages || !Array.isArray(messages)) {
       console.log("Chat API: Invalid messages format");
@@ -46,7 +45,9 @@ export async function POST(request) {
         messages: [
           { 
             role: "system", 
-            content: `You are an AI assistant that ONLY answers questions about the following page with this text:\n\n${pageText}\n\nIf the question is unrelated, respond with "I can only answer questions about the given text."`
+            content: `You are an AI assistant that ONLY answers questions about the following pdf with this text:\n\n${fullPdfText}\n\n. 
+            The current page on that pdf has this text:\n\n${pageText}\n\n and that page number is ${pageNumber}. 
+            If the question is unrelated, respond with "I can only answer questions about the given text."`
           },
           ...messages
         ],

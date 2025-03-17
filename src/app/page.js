@@ -13,6 +13,7 @@ export default function Home() {
   const [isChatExpanded, setIsChatExpanded] = useState(false);
   const [pageText, setPageText] = useState("");
   const [fullPdfText, setFullPdfText] = useState("");
+  const [pageNumber, setPageNumber] = useState(1);
   const fileUploadRef = useRef(null);
 
   const animateFileUpload = (element) => {
@@ -35,7 +36,7 @@ export default function Home() {
     animateFileUpload(fileUploadRef.current);
   }, []);
 
-  const handleFileChange = async (e) => {
+  const handleFileUpload = async (e) => {
     const uploadedFile = e.target.files[0];
     
     if (uploadedFile && uploadedFile.type === 'application/pdf') {
@@ -51,6 +52,8 @@ export default function Home() {
       setShowPDFViewer(true);
       setPageText("");
       setFullPdfText("");
+      setPageNumber(1);
+      setIsChatExpanded(false); // Close chat when new file is loaded
     } else {
       alert('Please upload a valid PDF file.');
     }
@@ -62,6 +65,8 @@ export default function Home() {
     setFile(null);
     setPageText("");
     setFullPdfText("");
+    setPageNumber(1);
+    setIsChatExpanded(false); // Close chat when changing files
     
     // Reset and show FileUpload with animation
     animateFileUpload(fileUploadRef.current);
@@ -74,7 +79,7 @@ export default function Home() {
         ref={fileUploadRef} 
         className={`h-full w-full transition-all flex justify-center items-center ${showPDFViewer ? 'hidden' : ''}`}
       >
-        <FileUpload onFileChange={handleFileChange} />
+        <FileUpload onFileChange={handleFileUpload} />
       </div>
 
       {/* PDF Viewer */}
@@ -87,15 +92,18 @@ export default function Home() {
             onFullPdfTextChange={setFullPdfText}
             isChatExpanded={isChatExpanded}
             onChatToggle={() => setIsChatExpanded(!isChatExpanded)}
+            onPageChange={setPageNumber}
           />
         </div>
       )}
 
       {/* Chat Box */}
       <ChatBox 
+        key={file?.name}
         isExpanded={isChatExpanded} 
         pageText={pageText}
         fullPdfText={fullPdfText}
+        pageNumber={pageNumber}
         onClose={() => setIsChatExpanded(false)} 
       />
     </div>
