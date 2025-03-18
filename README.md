@@ -9,22 +9,61 @@ A modern web application that combines PDF viewing with AI-powered text-to-speec
 - ⚡ Real-time audio generation and playback
 - 🎛️ Customizable voice settings (speed, temperature)
 - 🌓 Dark/Light mode support
+- 💬 Interactive AI chat assistant
+- 🎯 Smart page navigation
+
+## Design Principles
+
+### 1. User Experience
+- **Minimalist Interface**: Clean, distraction-free design focusing on content
+- **Progressive Enhancement**: Core features work without JavaScript, enhanced with JS
+- **Responsive Design**: Fluid layouts that work across all device sizes
+- **Intuitive Navigation**: Clear hierarchy and consistent interaction patterns
+- **Visual Feedback**: Smooth animations and transitions using GSAP
+- **Accessibility**: ARIA labels, keyboard navigation, and screen reader support
+
+### 2. Performance
+- **Optimized Loading**: Dynamic imports and code splitting
+- **Worker Threads**: PDF.js Web Worker for non-blocking PDF processing
+- **Real-time Processing**: Immediate audio generation on page changes
+- **Efficient State Management**: React hooks for local state management
+- **Resource Management**: Proper cleanup of WebSocket connections and audio resources
+
+### 3. Architecture
+- **Component-Based**: Modular, reusable components
+- **Separation of Concerns**: Clear distinction between UI, business logic, and data
+- **Type Safety**: TypeScript for better developer experience and code reliability
+- **Error Boundaries**: Graceful error handling and user feedback
+- **Security First**: Environment variables for sensitive data, proper API key management
 
 ## Technology Stack
 
-- **Frontend Framework**: Next.js 14 with App Router
-- **UI Components**: Shadcn/UI + Tailwind CSS
-- **Animations**: GSAP
-- **PDF Handling**: React-PDF + PDF.js
-  - Uses PDF.js Web Worker to run in separate thread to prevent UI blocking
-  - Configured via CDN for optimal loading
-- **Audio**: Web Audio API + PlayAI API
-  - Text-to-speech powered by PlayAI's advanced neural models
-  - Real-time audio streaming with low latency
-  - Multiple AI voices with customizable parameters
+### Frontend
+- **Framework**: Next.js 14 with App Router
+- **UI Components**: 
+  - Shadcn/UI (Radix UI primitives)
+  - Tailwind CSS for styling
+  - GSAP for animations
+- **State Management**: React Hooks
+- **PDF Processing**: 
+  - React-PDF
+  - PDF.js Web Worker
+- **Audio**: 
+  - Web Audio API
+  - PlayAI API for text-to-speech
 - **Icons**: Lucide React
-- **AI Chatbot**: PlayAI Agent API using web embedding
-  - Agent behavior prompt: Your only job is to answer questions about the current text on this page. Base your answers on the current text on the page. Do not do anything else. Do not offer to do anything else. After answering one question, ask if they have any more questions about the text on this page. Repeat until they have no more questions, and then end the call immediately.
+
+### Development Tools
+- **Language**: TypeScript/JavaScript
+- **Linting**: ESLint with Next.js config
+- **Package Management**: npm
+- **Build Tool**: Next.js built-in compiler
+- **Version Control**: Git
+
+### APIs and Services
+- **Text-to-Speech**: PlayAI API
+- **Chat Interface**: PlayAI Agent API
+- **PDF Processing**: PDF.js CDN
 
 ## Run Locally
 
@@ -42,11 +81,11 @@ A modern web application that combines PDF viewing with AI-powered text-to-speec
 3. Configure environment variables:
    ```bash
    # Create a .env.local file in the root directory
-   touch .env
+   touch .env.local
 
    # Add the following variables (replace with your actual values)
-   PLAYAI_API_KEY=your_api_key_here
-   PLAYAI_USER_ID=your_user_id_here
+   NEXT_PUBLIC_PLAYAI_API_KEY=your_api_key_here
+   NEXT_PUBLIC_PLAYAI_USER_ID=your_user_id_here
    ```
 
 4. Run the development server:
@@ -56,25 +95,10 @@ A modern web application that combines PDF viewing with AI-powered text-to-speec
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Design Decisions
+## Contributing
 
-- **Component Architecture**: Modular components for better maintainability and reusability
-- **State Management**: React hooks for local state, keeping the implementation simple and efficient
-- **Single root layout**: Scalable, consistent, and reusable layout for components
-- **TTS Integration**: 
-  - For each change in pageText state, immediately request API for audio data to minimize waiting time
-  - 
-- **UI/UX**: 
-  - Tried to maintain a clean, minimal, intuitive interface with smooth experience using GSAP
-  - Consistent design language using Shadcn open-source components and global tailwind css components
-  - Responsive design
-  - Dark mode / light mode using themeProvider context in root layout
-- **Websocket API integration**:
-  - Event and dynamic pageText content means setup and cleanup at each textData render
-    - Use React hooks to manage the WebSocket lifecycle and keep logic separate from UI
-    - Cleaner and modular - separating concerns
-    - Close and reinitialize the WebSocket when textData updates.
-    - Ensure only one active WebSocket connection exists at a time.
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
-- **Security**: 
-  - environmental variables for sensitive data
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
