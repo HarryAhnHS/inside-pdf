@@ -53,7 +53,7 @@ const PDFNavBar = ({ pageNumber, numPages, onPageChange, isAudioExpanded, onAudi
   }
 
   return (
-    <div className={`pt-6 pb-6 px-6 flex items-center justify-between`}>
+    <div className={`pt-6 pb-3 px-6 flex items-center justify-between`}>
       {/* Left side: Navigation buttons */}
       <div className="flex items-center gap-2">
         <Button

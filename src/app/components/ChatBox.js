@@ -133,7 +133,7 @@ export default function ChatBox({ isExpanded, pageText, fullPdfText, pageNumber,
                             <div className="flex items-center justify-between p-2 border-b">
                                 <div className="flex items-center gap-2 cursor-move drag-handle">
                                     <GripVertical className="h-4 w-4 text-muted-foreground" />
-                                    <span className="text-sm font-medium">Chat with AI about the document</span>
+                                    <span className="text-sm font-medium">Chat with AI about this document</span>
                                 </div>
                                 <Button
                                     variant="ghost"

@@ -194,16 +194,11 @@ const PDFAudioControls = ({ pageText }) => {
               <Loader2 className="h-4 w-4 animate-spin" />
               <span className="text-sm">Processing audio...</span>
             </div>
-            <p className="text-center text-xs italic">It may take a while for the audio to load.</p>
           </div>
         )
         :
           (
-          <div>
-            <div className="flex items-center gap-1 mb-2 text-muted-foreground text-xs">
-              <FileAudio className="h-3 w-3" />
-              <span>Audio</span>
-            </div>
+          <div className="border-t border-muted pt-3">
             {/* Audio player */}
             <div className="flex items-center">
               <Button
