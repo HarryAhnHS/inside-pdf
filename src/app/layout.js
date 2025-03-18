@@ -1,17 +1,20 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Karla, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ThemeProvider from "./components/ThemeProvider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const karla = Karla({
   subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+  adjustFontFallback: true,
+  fallback: ['system-ui', 'arial'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata = {
@@ -23,7 +26,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gradient-to-b from-background to-muted/50 font-sans antialiased`}
+        className={`${karla.className} min-h-screen bg-gradient-to-b from-background to-muted/50 antialiased`}
       >
         <ThemeProvider>
           <div className="relative flex min-h-screen flex-col">
