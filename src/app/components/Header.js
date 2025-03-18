@@ -11,7 +11,7 @@ const Header = () => {
     <header className="w-full border-b">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-2">
-          <span className="text-lg font-light tracking-tight">PlayAI Book Reader</span>
+          <span className="text-lg font-light tracking-tight">InsidePDF</span>
         </div>
         <div className="flex items-center gap-4">
           <Button

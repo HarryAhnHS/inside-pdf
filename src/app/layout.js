@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background font-sans antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gradient-to-b from-background to-muted/50 font-sans antialiased`}
       >
         <ThemeProvider>
           <div className="relative flex min-h-screen flex-col">

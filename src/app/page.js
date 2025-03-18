@@ -2,9 +2,11 @@
 import dynamic from 'next/dynamic';
 import { useRef, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
+import { FileAudio, MessageSquareText, BookOpen } from 'lucide-react';
 
 import FileUpload from './components/FileUpload';
 import ChatBox from './components/ChatBox';
+import Hero from './components/Hero';
 const PDFDashboard = dynamic(() => import('./components/PDFDashboard'), { ssr: false }); // Disable SSR PDFViewer by dynamically importing
 
 export default function Home() {
@@ -80,12 +82,16 @@ export default function Home() {
 
   return (
     <div className='h-full'>
-      {/* File Upload */}
+      {/* File Upload View */}
       <div 
         ref={fileUploadRef} 
-        className={`h-full w-full transition-all flex justify-center items-center ${showPDFViewer ? 'hidden' : ''}`}
+        className={`min-h-screen w-full transition-all flex flex-col ${showPDFViewer ? 'hidden' : ''}`}
       >
-        <FileUpload onFileChange={handleFileUpload} fileInputRef={fileInputRef} file={file}/>
+        <Hero />
+        {/* File Upload */}
+        <div className="flex-1 flex justify-center items-center p-8">
+          <FileUpload onFileChange={handleFileUpload} fileInputRef={fileInputRef} file={file}/>
+        </div>
       </div>
 
       {/* PDF Viewer */}
