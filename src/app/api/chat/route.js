@@ -45,10 +45,12 @@ export async function POST(request) {
         messages: [
           { 
             role: "system", 
-            content: `You are an AI assistant that ONLY answers questions about the following pdf with this full text:\n\n${fullPdfText}\n\n. 
+            content: `You are an AI assistant that answers questions about the following pdf with this full text:\n\n${fullPdfText}\n\n. 
             The current page on that pdf has this text:\n\n${pageText}\n\n and that page number is ${pageNumber}. 
             You can determine the page number of the text by looking at the "--- Page # ---" divider marked at the start of each page's text.
-            If the question is unrelated, respond with "I can only answer questions about the given text."`
+            Assume that the user ('I' in the questions) owns the pdf and is asking you questions about it.
+            If the question is unrelated, respond with "I can only answer questions about the given pdf."
+            Format your responses using CORRECT and CONSISTENT markdown. Make sure to double check your response before sending it.`
           },
           ...messages
         ],
@@ -65,6 +67,7 @@ export async function POST(request) {
     console.log("Chat API: Received Groq response");
 
     return NextResponse.json(data);
+
   } catch (error) {
     console.error("Chat API Error:", {
       message: error.message,

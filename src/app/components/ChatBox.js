@@ -8,6 +8,7 @@ import { Loader2, Send, X, GripVertical } from "lucide-react";
 import Draggable from "react-draggable";
 import { Resizable } from "react-resizable";
 import "react-resizable/css/styles.css";
+import ReactMarkdown from "react-markdown";
 
 export default function ChatBox({ isExpanded, pageText, fullPdfText, pageNumber, onClose }) {
     const [messages, setMessages] = useState([]);
@@ -154,13 +155,29 @@ export default function ChatBox({ isExpanded, pageText, fullPdfText, pageNumber,
                                             }`}
                                         >
                                             <div
-                                                className={`max-w-[80%] rounded-lg p-3 break-words text-sm leading-relaxed ${
+                                                className={`max-w-[80%] rounded-lg p-3 break-words text-sm leading-relaxed prose prose-sm dark:prose-invert prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-li:my-0 ${
                                                     message.role === "user"
                                                         ? "bg-primary text-primary-foreground"
                                                         : "bg-muted"
                                                 }`}
                                             >
-                                                {message.content}
+                                                <ReactMarkdown
+                                                    components={{
+                                                        p: ({ children }) => <p className="my-1">{children}</p>,
+                                                        ul: ({ children }) => <ul className="my-1 list-disc pl-4">{children}</ul>,
+                                                        ol: ({ children }) => <ol className="my-1 list-decimal pl-4">{children}</ol>,
+                                                        li: ({ children }) => <li className="my-0">{children}</li>,
+                                                        h1: ({ children }) => <h1 className="text-lg font-bold my-2">{children}</h1>,
+                                                        h2: ({ children }) => <h2 className="text-base font-bold my-2">{children}</h2>,
+                                                        h3: ({ children }) => <h3 className="text-sm font-bold my-2">{children}</h3>,
+                                                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                                                        em: ({ children }) => <em className="italic">{children}</em>,
+                                                        code: ({ children }) => <code className="bg-muted-foreground/10 px-1 rounded">{children}</code>,
+                                                        pre: ({ children }) => <pre className="bg-muted-foreground/10 p-2 rounded my-2 overflow-x-auto">{children}</pre>,
+                                                    }}
+                                                >
+                                                    {message.content}
+                                                </ReactMarkdown>
                                             </div>
                                         </div>
                                     ))}

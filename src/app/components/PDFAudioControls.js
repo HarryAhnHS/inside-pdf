@@ -22,7 +22,7 @@ const PDFAudioControls = ({ pageText }) => {
   // Default settings
   const [settings, setSettings] = useState({
     voice: "Angelo",
-    speed: 1.3,
+    speed: 1.1,
     temperature: 0.7,
   })
 
